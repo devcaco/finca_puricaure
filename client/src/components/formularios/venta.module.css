@@ -1,0 +1,22 @@
+.form h2 {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.form form {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 10px;
+  /* justify-content: ; */
+  margin-bottom: 2rem;
+}
+
+.form button {
+  /* grid-column-start: 0;
+    grid-column-end: 3; */
+  grid-column: 1/-1;
+}
+
+.form form button:nth-child(1){
+    display: none;
+}
