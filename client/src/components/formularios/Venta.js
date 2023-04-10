@@ -1,33 +1,74 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 import styles from './venta.module.css';
 
 const Venta = ({ onClose }) => {
   const [formInput, setFormInput] = useState({
     fechaVenta: new Date().toISOString().slice(0, 10),
-    nroReferencia: 1001,
+    nroStock: '',
     pesoSalida: 0,
     precio: 0,
   });
-  const [isReposicion, setIsReposicion] = useState(false);
+  const [stocks, setStocks] = useState([]);
+  const [errorMsg, setErrorMsg] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    console.log({
+      nroStock: formInput.nroStock,
+      fechaVenta: formInput.fechaVenta,
+      precio: formInput.precio,
+    });
+
+    if (!formInput.nroStock || !formInput.fechaVenta || !formInput.precio) {
+      setErrorMsg('Formulario Invalido.');
+      return false;
+    }
+
+    const response = await axios.post(
+      'http://localhost:5005/api/stock/venta',
+      formInput
+    );
+
+    if (response.data.ok) {
+      onClose();
+    } else {
+      setErrorMsg(response.data.errorMsg);
+    }
   };
 
-  const handleChange = (e) => {
-    if (e.target.name === 'reposicion') {
-      e.target.value = e.target.checked;
-      setIsReposicion(e.target.checked);
-    }
-    console.log(e.target.name, e.target.value);
+  const fetchStock = async () => {
+    try {
+      const response = await axios.get(
+        'http://localhost:5005/api/stock/stockVenta'
+      );
 
+      if (response.data.ok) {
+        setStocks(response.data.stockVenta);
+        console.log({ theResponse: response.data.stockVenta });
+      } else {
+        throw new Error(response.data.errorMsg);
+      }
+    } catch (err) {
+      console.log('ERROR > ', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchStock();
+  }, []);
+
+  const handleChange = (e) => {
+    setErrorMsg('');
     setFormInput({ ...formInput, [e.target.name]: e.target.value });
   };
 
   return (
     <div className={styles.form}>
       <h2>Formulario de Venta</h2>
+      {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
       <form onSubmit={handleSubmit}>
         <label htmlFor="fechaVenta">Fecha Venta</label>
         <input
@@ -37,15 +78,21 @@ const Venta = ({ onClose }) => {
           onChange={handleChange}
           value={formInput.fechaVenta}
         />
-        <label htmlFor="nroReferencia">Nro de Stock</label>
-        <input
-          type="number"
-          name="nroReferencia"
-          id="nroReferencia"
+        <label htmlFor="nroStock">Nro de Stock</label>
+        <select
+          name="nroStock"
+          id="nroStock"
           onChange={handleChange}
-          value={formInput.nroReferencia}
-          step="1"
-        />
+          value={formInput.nroStock}
+          disabled={!stocks.length ? 'disabled': ''}
+        >
+          <option value="">Seleccionar</option>
+          {stocks.map((stock) => (
+            <option key={stock._id} value={stock._id}>
+              {stock.stockNro}
+            </option>
+          ))}
+        </select>
 
         <label htmlFor="pesoSalida">Peso Salida</label>
         <div style={{ width: '100%', display: 'flex' }}>
@@ -64,9 +111,9 @@ const Venta = ({ onClose }) => {
             onChange={handleChange}
             value={formInput.unidadPeso}
           >
-            <option value="Kgs">Kgs</option>
-            <option value="Lbs">Lbs</option>
-            <option value="Grm">Grms</option>
+            <option value="kg">Kgs</option>
+            <option value="lb">Lbs</option>
+            <option value="grm">Grms</option>
           </select>
         </div>
 
@@ -79,29 +126,6 @@ const Venta = ({ onClose }) => {
           value={formInput.precio}
           step=".1"
         />
-
-        <label htmlFor="precio">Reposicion?</label>
-        <input
-          type="checkbox"
-          name="reposicion"
-          id="reposicion"
-          onChange={handleChange}
-        ></input>
-        {isReposicion && (
-          <>
-            <label htmlFor="animalRepuesto">Stock</label>
-            <select
-              name="animalRepuesto"
-              id="animalRepuesto"
-              onChange={handleChange}
-              value={formInput.animalRepuesto}
-            >
-              <option value="1">Stock 1</option>
-              <option value="2">Stock 2</option>
-              <option value="3">Stock 3</option>
-            </select>
-          </>
-        )}
 
         <button style={{ marginTop: '20px' }}>Guardar</button>
         <button type="button" onClick={onClose}>

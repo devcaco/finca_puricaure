@@ -4,7 +4,15 @@ const Peso = require('../models/Peso.model');
 
 router.get('/', async (req, res, next) => {
   try {
-    const response = await Stock.find().populate('compra.peso', 'peso');
+    const response = await Stock.find()
+      .populate({
+        path: 'pesos',
+        options: {
+          sort: { createdAt: -1, fecha: -1 },
+        },
+        // options: { sort: [{ fecha: -1 }, { createdAt: -1 }] },
+      })
+      .populate('compra.peso', 'peso');
     res.status(200).json({ ok: true, stocks: response });
   } catch (err) {
     console.log('ERROR -> ', err.message);
@@ -27,9 +35,33 @@ router.get('/nro', async (req, res, next) => {
 
 router.get('/stockReposicion', async (req, res, next) => {
   try {
-    const response = await Stock.find();
+    const response = await Stock.find({
+      $and: [
+        { venta: { $exists: true, $ne: {} } },
+        {
+          $or: [
+            { reposicion: { $exists: false } },
+            { reposicion: { $eq: null } },
+          ],
+        },
+      ],
+    });
 
+    console.log({ stockReposicion: response });
     res.status(200).json({ ok: true, stockReposicion: response });
+  } catch (err) {
+    console.log('ERROR -> ', err.message);
+    res.status(200).json({ ok: false, errorMsg: err.message });
+  }
+});
+
+router.get('/stockVenta', async (req, res, next) => {
+  try {
+    const response = await Stock.find({
+      $or: [{ venta: { $exists: false } }, { venta: { $eq: {} } }],
+    });
+
+    res.status(200).json({ ok: true, stockVenta: response });
   } catch (err) {
     console.log('ERROR -> ', err.message);
     res.status(200).json({ ok: false, errorMsg: err.message });
@@ -38,6 +70,7 @@ router.get('/stockReposicion', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
   try {
+    const data = req.body;
     const stockNro =
       (await Stock.findOne({ stockNro: req.body.nroStock })) || false;
 
@@ -59,7 +92,18 @@ router.post('/', async (req, res, next) => {
       },
       venta: {},
       pesos: [peso._id],
+      reposicion: null,
     });
+
+    if (data.stockReposicion) {
+      const updatedStock = await Stock.findByIdAndUpdate(
+        data.stockReposicion,
+        {
+          reposicion: stock._id,
+        },
+        { new: true }
+      );
+    }
 
     const updatePeso = await Peso.findByIdAndUpdate(
       peso._id,
@@ -70,6 +114,71 @@ router.post('/', async (req, res, next) => {
     res.status(200).json({ ok: true, peso, stock });
   } catch (err) {
     console.log('ERROR -> ', err);
+    res.status(200).json({ ok: false, errorMsg: err.message });
+  }
+});
+
+router.post('/venta', async (req, res, next) => {
+  try {
+    const data = req.body;
+
+    const peso = await Peso.create({
+      fecha: new Date(req.body.fechaVenta),
+      tipo: 'venta',
+      peso: req.body.pesoSalida,
+      unidad: 'kg',
+    });
+
+    const stock = await Stock.findByIdAndUpdate(
+      data.nroStock,
+      {
+        venta: {
+          fecha: new Date(data.fechaVenta),
+          precio: data.precio,
+          peso: peso._id,
+        },
+        $push: { pesos: peso._id },
+      },
+      { new: true }
+    );
+
+    const updatedPeso = await Peso.findByIdAndUpdate(
+      peso._id,
+      { stock: stock._id },
+      { new: true }
+    );
+
+    res.status(200).json({ ok: true, stock, updatedPeso });
+  } catch (err) {
+    console.log('ERROR -> ', err.message);
+    res.status(200).json({ ok: false, errorMsg: err.message });
+  }
+});
+
+router.post('/peso', async (req, res, next) => {
+  try {
+    data = req.body;
+    const response = await Peso.create({
+      fecha: new Date(data.fecha),
+      peso: data.peso,
+      stock: data.nroStock,
+      tipo: 'control',
+      unidad: 'kg',
+    });
+
+    const updatedStock = await Stock.findByIdAndUpdate(
+      data.nroStock,
+      {
+        $push: { pesos: response._id },
+      },
+      { new: true }
+    );
+
+    console.log({ updatedStock });
+
+    res.status(200).json({ ok: true, response });
+  } catch (err) {
+    console.log('ERROR -> ', err.message);
     res.status(200).json({ ok: false, errorMsg: err.message });
   }
 });

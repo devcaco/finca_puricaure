@@ -1,6 +1,13 @@
 .form h2 {
-    text-align: center;
-    margin-bottom: 3rem;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.errorMsg {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
 .form form {
@@ -17,6 +24,6 @@
   grid-column: 1/-1;
 }
 
-.form form button:nth-child(1){
-    display: none;
+.form form button:nth-child(1) {
+  display: none;
 }

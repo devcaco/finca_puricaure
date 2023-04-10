@@ -6,3 +6,11 @@
 .header {
     padding: 2rem 0
 }
+
+.vendido {
+    font-size: 2rem;
+    font-weight: bold;
+    color: green;
+    text-align: center;
+    margin: 0 auto; 
+}

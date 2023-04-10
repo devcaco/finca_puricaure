@@ -20,7 +20,11 @@ const Compra = ({ onClose }) => {
         const response = await axios.get(
           'http://localhost:5005/api/stock/stockReposicion'
         );
-        setStockReposicion([...response.data.stockReposicion]);
+        if (response.data.ok)
+          setStockReposicion([...response.data.stockReposicion]);
+        else {
+          throw new Error(response.data.errorMsg);
+        }
       } catch (err) {
         console.log('error', err);
       }
@@ -63,18 +67,17 @@ const Compra = ({ onClose }) => {
     );
 
     if (!response.data.ok) {
-      console.log('Error Not OK');
-      console.log({ theResponse: response.data });
-      setErrorMsg(response.errorMsg);
+      setErrorMsg(response.data.errorMsg);
     } else onClose();
   };
 
   const handleChange = (e) => {
+    setErrorMsg('');
+
     if (e.target.name === 'reposicion') {
       e.target.value = e.target.checked;
       setIsReposicion(e.target.checked);
     }
-    console.log(e.target.name, e.target.value);
 
     setFormInput({ ...formInput, [e.target.name]: e.target.value });
   };
@@ -122,9 +125,9 @@ const Compra = ({ onClose }) => {
             onChange={handleChange}
             value={formInput.unidadPeso}
           >
-            <option value="Kgs">Kgs</option>
-            <option value="Lbs">Lbs</option>
-            <option value="Grm">Grms</option>
+            <option value="kg">Kgs</option>
+            <option value="lb">Lbs</option>
+            <option value="grm">Grms</option>
           </select>
         </div>
 
@@ -154,13 +157,12 @@ const Compra = ({ onClose }) => {
               id="stockReposicion"
               onChange={handleChange}
               value={formInput.stockReposicion}
-              disabled={
-                stockReposicion && stockReposicion.length ? '' : 'disabled'
-              }
+              disabled={!stockReposicion.length ? 'disabled' : ''}
             >
+              <option value="">------</option>
               {stockReposicion &&
                 stockReposicion.map((stock) => (
-                  <option key={stock._id} value={stock.stockNro}>
+                  <option key={stock._id} value={stock._id}>
                     {stock.stockNro}
                   </option>
                 ))}

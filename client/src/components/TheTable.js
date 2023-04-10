@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Table } from 'antd';
 import axios from 'axios';
 
+import { CheckSquareOutlined } from '@ant-design/icons';
+
 import styles from './TheTable.module.css';
 
 const columns = [
@@ -40,6 +42,20 @@ const columns = [
             .toFixed(2)
             .toLocaleString(undefined, { maximumFractionDigits: 2 })}
       </>
+    ),
+  },
+  {
+    title: 'Ultimo Peso',
+    dataIndex: 'pesos',
+    key: 'pesos',
+    render: (pesos, rows) => <>{pesos.length ? pesos[0].peso + ' kgs' : ''}</>,
+  },
+  {
+    title: 'Vendido',
+    dataIndex: 'venta',
+    key: 'venta',
+    render: (venta, rows) => (
+      <>{venta && <CheckSquareOutlined className={styles.vendido} />}</>
     ),
   },
 ];

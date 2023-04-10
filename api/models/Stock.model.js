@@ -50,13 +50,6 @@ const stockSchema = new Schema(
     },
     // venta: { type: ventaSchema, required: false },
     reposicion: { type: Schema.Types.ObjectId, ref: 'Stock' },
-    vendido: {
-      type: Boolean,
-      default: false,
-      get: function () {
-        return Object.keys(this.venta).length;
-      },
-    },
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`

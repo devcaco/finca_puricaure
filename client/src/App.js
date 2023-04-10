@@ -19,7 +19,8 @@ function App() {
 
   const fetchStock = async () => {
     const response = await axios.get('http://localhost:5005/api/stock/');
-    setStocks(response.data.stocks);
+    console.log({ theStocks: response.data.stocks });
+    if (response.data.ok) setStocks(response.data.stocks);
   };
 
   const deleteStock = async (stockArr) => {
