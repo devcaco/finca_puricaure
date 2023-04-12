@@ -4,6 +4,10 @@
     padding-bottom: 20px;
 }
 
-.buttons * {
+.buttons Button {
     margin-left: 20px;
 }
+
+/* .buttons * {
+    margin-left: 20px;
+} */

@@ -1,0 +1,56 @@
+.details {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: .85rem;
+}
+
+.details h2 {
+  text-align: center;
+}
+
+.errorMsg {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 10px;
+  margin-bottom: 2rem;
+  width: 100%;;
+}
+
+.grid_peso {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 10px;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.details__grid-title {
+  grid-column: 1/-1;
+  text-align: center;
+  background-color: #dedede;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+.details__body {
+    display: flex;
+    gap: 3rem;
+    justify-content: space-between;
+}
+
+.details__grid_right {
+    flex: 1
+}
+
+.details__grid_left {
+    flex: 1
+}

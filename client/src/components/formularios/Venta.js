@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Button } from 'antd';
 
 import styles from './venta.module.css';
 
@@ -16,43 +17,41 @@ const Venta = ({ onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log({
-      nroStock: formInput.nroStock,
-      fechaVenta: formInput.fechaVenta,
-      precio: formInput.precio,
-    });
+    try {
+      if (!formInput.nroStock || !formInput.fechaVenta || !formInput.precio) {
+        throw new Error('Formulario Invalido.');
+      }
 
-    if (!formInput.nroStock || !formInput.fechaVenta || !formInput.precio) {
-      setErrorMsg('Formulario Invalido.');
-      return false;
-    }
+      const response = await axios.post(
+        process.env.REACT_APP_API + 'stock/venta',
+        formInput
+      );
 
-    const response = await axios.post(
-      'http://localhost:5005/api/stock/venta',
-      formInput
-    );
-
-    if (response.data.ok) {
-      onClose();
-    } else {
-      setErrorMsg(response.data.errorMsg);
+      if (response.data.ok) {
+        onClose(true);
+      } else {
+        throw new Error(response.data.errorMsg);
+      }
+    } catch (err) {
+      console.log('ERROR -> ', err.message);
+      setErrorMsg(err.message);
     }
   };
 
   const fetchStock = async () => {
     try {
       const response = await axios.get(
-        'http://localhost:5005/api/stock/stockVenta'
+        process.env.REACT_APP_API + 'stock/stockVenta'
       );
 
       if (response.data.ok) {
         setStocks(response.data.stockVenta);
-        console.log({ theResponse: response.data.stockVenta });
       } else {
         throw new Error(response.data.errorMsg);
       }
     } catch (err) {
-      console.log('ERROR > ', err);
+      console.log('ERROR -> ', err.message);
+      setErrorMsg(err.message);
     }
   };
 
@@ -62,7 +61,9 @@ const Venta = ({ onClose }) => {
 
   const handleChange = (e) => {
     setErrorMsg('');
-    setFormInput({ ...formInput, [e.target.name]: e.target.value });
+    setFormInput((prevState) => {
+      return { ...prevState, [e.target.name]: e.target.value };
+    });
   };
 
   return (
@@ -84,7 +85,7 @@ const Venta = ({ onClose }) => {
           id="nroStock"
           onChange={handleChange}
           value={formInput.nroStock}
-          disabled={!stocks.length ? 'disabled': ''}
+          disabled={!stocks.length ? 'disabled' : ''}
         >
           <option value="">Seleccionar</option>
           {stocks.map((stock) => (
@@ -127,10 +128,10 @@ const Venta = ({ onClose }) => {
           step=".1"
         />
 
-        <button style={{ marginTop: '20px' }}>Guardar</button>
-        <button type="button" onClick={onClose}>
-          Cerrar
-        </button>
+        <Button type="primary" htmlType="submit" style={{ marginTop: '20px' }}>
+          Guardar
+        </Button>
+        <Button onClick={onClose}>Cerrar</Button>
       </form>
     </div>
   );

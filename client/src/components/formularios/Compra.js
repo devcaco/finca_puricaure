@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
+import { Button } from 'antd';
 
 import styles from './compra.module.css';
 
@@ -10,6 +11,7 @@ const Compra = ({ onClose }) => {
   const [formInput, setFormInput] = useState({
     fecha: new Date().toISOString().slice(0, 10),
     nroStock: 1001,
+    nroLote: 0,
     pesoEntrada: 0,
     precio: 0,
   });
@@ -18,7 +20,7 @@ const Compra = ({ onClose }) => {
     const getStockReposicion = async () => {
       try {
         const response = await axios.get(
-          'http://localhost:5005/api/stock/stockReposicion'
+          process.env.REACT_APP_API + 'stock/stockReposicion'
         );
         if (response.data.ok)
           setStockReposicion([...response.data.stockReposicion]);
@@ -26,16 +28,26 @@ const Compra = ({ onClose }) => {
           throw new Error(response.data.errorMsg);
         }
       } catch (err) {
-        console.log('error', err);
+        console.log('ERROR -> ', err.message);
+        setErrorMsg(err.message);
       }
     };
 
     const getStockNro = async () => {
       try {
-        const response = await axios.get('http://localhost:5005/api/stock/nro');
-        setFormInput({ ...formInput, nroStock: response.data.stockNro });
+        const response = await axios.get(
+          process.env.REACT_APP_API + 'stock/nro'
+        );
+
+        if (response.data.ok)
+          setFormInput((prevState) => {
+            return { ...prevState, nroStock: response.data.stockNro };
+          });
+        // return response.data.stockNro;
+        else throw new Error(response.data.errorMsg);
       } catch (err) {
         console.log('error', err);
+        // return 0;
       }
     };
 
@@ -46,29 +58,36 @@ const Compra = ({ onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      !formInput.nroStock ||
-      !formInput.fecha ||
-      !formInput.pesoEntrada ||
-      !formInput.precio
-    ) {
-      setErrorMsg('Favor llenar campos requeridos');
-      return false;
+    try {
+      if (
+        !formInput.nroStock ||
+        !formInput.nroLote ||
+        !formInput.fecha ||
+        !formInput.pesoEntrada ||
+        !formInput.precio
+      ) {
+        throw new Error('Favor llenar campos requeridos');
+        // setErrorMsg('Favor llenar campos requeridos');
+        // return false;
+      }
+
+      if (isReposicion && !formInput.stockReposicion) {
+        throw new Error('Favor seleccionar la reposicion');
+        // setErrorMsg('Favor seleccionar la reposicion');
+        // return false;
+      }
+
+      const response = await axios.post(
+        process.env.REACT_APP_API + 'stock/',
+        formInput
+      );
+
+      if (response.data.ok) onClose(true);
+      else throw new Error(response.data.errorMsg);
+    } catch (err) {
+      console.log('ERROR -> ', err);
+      setErrorMsg(err.message);
     }
-
-    if (isReposicion && !formInput.stockReposicion) {
-      setErrorMsg('Favor seleccionar la reposicion');
-      return false;
-    }
-
-    const response = await axios.post(
-      'http://localhost:5005/api/stock/',
-      formInput
-    );
-
-    if (!response.data.ok) {
-      setErrorMsg(response.data.errorMsg);
-    } else onClose();
   };
 
   const handleChange = (e) => {
@@ -86,7 +105,7 @@ const Compra = ({ onClose }) => {
     <div className={styles.form}>
       <h2>Formulario de Entrada</h2>
       {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} name="compraForm" id="compraForm">
         <label htmlFor="fecha">Fecha Compra</label>
         <input
           type="date"
@@ -103,6 +122,17 @@ const Compra = ({ onClose }) => {
           id="nroStock"
           onChange={handleChange}
           value={formInput.nroStock}
+          step="1"
+          required
+        />
+
+        <label htmlFor="nroLote">Nro de Lote</label>
+        <input
+          type="number"
+          name="nroLote"
+          id="nroLote"
+          onChange={handleChange}
+          value={formInput.nroLote}
           step="1"
           required
         />
@@ -170,10 +200,10 @@ const Compra = ({ onClose }) => {
           </>
         )}
 
-        <button style={{ marginTop: '20px' }}>Guardar</button>
-        <button type="button" onClick={onClose}>
-          Cerrar
-        </button>
+        <Button type="primary" htmlType="submit" style={{ marginTop: '20px' }}>
+          Guardar
+        </Button>
+        <Button onClick={onClose}>Cerrar</Button>
       </form>
     </div>
   );

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Button } from 'antd';
 
 import styles from './peso.module.css';
 
@@ -15,7 +16,7 @@ const Peso = ({ onClose }) => {
   const fetchStock = async () => {
     try {
       const response = await axios.get(
-        'http://localhost:5005/api/stock/stockVenta'
+        process.env.REACT_APP_API + 'stock/stockVenta'
       );
 
       if (response.data.ok) setStocks(response.data.stockVenta);
@@ -35,29 +36,31 @@ const Peso = ({ onClose }) => {
 
     try {
       if (!formInput.fecha || !formInput.nroStock || !formInput.peso) {
-        setErrorMsg('Formulario Invalido: Favor llenar campos requeridos');
-        return;
+        throw new Error('Formulario Invalido: Favor llenar campos requeridos');
       }
 
       const response = await axios.post(
-        'http://localhost:5005/api/stock/peso',
+        process.env.REACT_APP_API + 'stock/peso',
         formInput
       );
 
       if (response.data.ok) {
-        onClose();
+        onClose(true);
       } else {
         throw new Error(response.data.errorMsg);
       }
     } catch (err) {
       console.log('ERROR -> ', err);
+      setErrorMsg(err.message);
     }
   };
 
   const handleChange = (e) => {
-    setFormInput({ ...formInput, [e.target.name]: e.target.value });
-
     setErrorMsg('');
+
+    setFormInput((prevState) => {
+      return { ...prevState, [e.target.name]: e.target.value };
+    });
   };
 
   return (
@@ -79,7 +82,7 @@ const Peso = ({ onClose }) => {
           id="nroStock"
           onChange={handleChange}
           value={formInput.nroStock}
-          disabled={!stocks ? 'disabled' : ''}
+          disabled={!stocks.length ? 'disabled' : ''}
         >
           <option value="">Seleccionar</option>
           {stocks &&
@@ -112,10 +115,10 @@ const Peso = ({ onClose }) => {
             <option value="grm">Grms</option>
           </select>
         </div>
-        <button style={{ marginTop: '20px' }}>Guardar</button>
-        <button type="button" onClick={onClose}>
-          Cerrar
-        </button>
+        <Button type="primary" htmlType="submit" style={{ marginTop: '20px' }}>
+          Guardar
+        </Button>
+        <Button onClick={onClose}>Cerrar</Button>
       </form>
     </div>
   );
