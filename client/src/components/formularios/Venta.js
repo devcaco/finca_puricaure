@@ -1,42 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Button } from 'antd';
+import { Button, Form, InputNumber, Select, DatePicker } from 'antd';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 import styles from './venta.module.css';
 
+dayjs.extend(customParseFormat);
+const dateFormatList = ['MM/DD/YYYY', 'MM/DD/YY', 'MM-DD-YYYY', 'MM-DD-YY'];
+
 const Venta = ({ onClose }) => {
-  const [formInput, setFormInput] = useState({
-    fechaVenta: new Date().toISOString().slice(0, 10),
-    nroStock: '',
-    pesoSalida: 0,
-    precio: 0,
-  });
   const [stocks, setStocks] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    try {
-      if (!formInput.nroStock || !formInput.fechaVenta || !formInput.precio) {
-        throw new Error('Formulario Invalido.');
-      }
-
-      const response = await axios.post(
-        process.env.REACT_APP_API + 'stock/venta',
-        formInput
-      );
-
-      if (response.data.ok) {
-        onClose(true);
-      } else {
-        throw new Error(response.data.errorMsg);
-      }
-    } catch (err) {
-      console.log('ERROR -> ', err.message);
-      setErrorMsg(err.message);
-    }
-  };
+  const [form] = Form.useForm();
 
   const fetchStock = async () => {
     try {
@@ -59,80 +35,178 @@ const Venta = ({ onClose }) => {
     fetchStock();
   }, []);
 
-  const handleChange = (e) => {
+  const handleFormError = (formError) => {
+    setErrorMsg('Formulario Invalido');
+  };
+
+  const handleChange = (name, value) => {
     setErrorMsg('');
-    setFormInput((prevState) => {
-      return { ...prevState, [e.target.name]: e.target.value };
-    });
+  };
+
+  const handleSubmit = async (formInput) => {
+    try {
+      if (!formInput.nroStock || !formInput.fechaVenta || !formInput.precio) {
+        throw new Error('Formulario Invalido.');
+      }
+
+      const response = await axios.post(
+        process.env.REACT_APP_API + 'stock/venta',
+        formInput
+      );
+
+      if (response.data.ok) {
+        onClose(true);
+      } else {
+        throw new Error(response.data.errorMsg);
+      }
+    } catch (err) {
+      console.log('ERROR -> ', err.message);
+      setErrorMsg(err.message);
+    }
   };
 
   return (
     <div className={styles.form}>
       <h2>Formulario de Venta</h2>
       {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
-      <form onSubmit={handleSubmit}>
+      <Form
+        name={'ventaForm'}
+        form={form}
+        onFinish={handleSubmit}
+        onFinishFailed={handleFormError}
+        initialValues={{
+          fechaVenta: dayjs(),
+          nroStock: '',
+          pesoSalida: 0,
+          unidadPeso: 'kg',
+          precio: 0,
+        }}
+      >
         <label htmlFor="fechaVenta">Fecha Venta</label>
-        <input
-          type="date"
+        <Form.Item
           name="fechaVenta"
-          id="fechaVenta"
-          onChange={handleChange}
-          value={formInput.fechaVenta}
-        />
-        <label htmlFor="nroStock">Nro de Stock</label>
-        <select
-          name="nroStock"
-          id="nroStock"
-          onChange={handleChange}
-          value={formInput.nroStock}
-          disabled={!stocks.length ? 'disabled' : ''}
+          rules={[{ required: true, message: 'Favor llenar fecha de venta' }]}
+          noStyle
         >
-          <option value="">Seleccionar</option>
-          {stocks.map((stock) => (
-            <option key={stock._id} value={stock._id}>
-              {stock.stockNro}
-            </option>
-          ))}
-        </select>
+          <DatePicker
+            format={dateFormatList}
+            onChange={(date, dateString) => {
+              handleChange('fechaVenta', dayjs(date, dateFormatList[0]));
+            }}
+          />
+        </Form.Item>
+        <label htmlFor="nroStock">Nro de Stock</label>
+        <Form.Item
+          name={'nroStock'}
+          rules={[
+            { required: true, message: 'Favor seleccionar nro de Stock' },
+          ]}
+          noStyle
+        >
+          <Select
+            style={{ minWidth: '200px' }}
+            placeholder={'Nro de Stock'}
+            showSearch
+            optionFilterProp="children"
+            onChange={(value) => {
+              handleChange('nroStock', value);
+            }}
+            disabled={stocks.length ? false : true}
+            filterOption={(input, option) =>
+              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+            }
+            options={[
+              {
+                value: '',
+                label: '-------',
+              },
+              ...stocks.map((stock) => ({
+                key: `${stock._id}`,
+                value: `${stock._id}`,
+                label: `${stock.stockNro}`,
+              })),
+            ]}
+          />
+        </Form.Item>
 
         <label htmlFor="pesoSalida">Peso Salida</label>
-        <div style={{ width: '100%', display: 'flex' }}>
-          <input
-            type="number"
-            name="pesoSalida"
-            id="pesoSalida"
-            onChange={handleChange}
-            value={formInput.pesoSalida}
-            step=".1"
-            style={{ flex: '1' }}
+        <Form.Item
+          noStyle
+          name="pesoSalida"
+          rules={[
+            { required: true, message: 'Favor introducir el peso' },
+            {
+              type: 'number',
+              min: 0.5,
+              message: 'Favor introducir un valor valido para el peso.',
+            },
+          ]}
+        >
+          <InputNumber
+            onChange={(value) => {
+              handleChange('pesoSalida', value);
+            }}
+            step={1}
+            min={1}
+            addonAfter={
+              <Select
+                name="unidadPeso"
+                onChange={(value) => {
+                  handleChange('unidadPeso', value);
+                }}
+                options={[
+                  {
+                    value: 'kg',
+                    label: 'Kgs',
+                  },
+                  {
+                    value: 'lb',
+                    label: 'Lbs',
+                  },
+                  {
+                    value: 'grm',
+                    label: 'Grms',
+                  },
+                ]}
+              />
+            }
           />
-          <select
-            name="unidadPeso"
-            id="unidadPeso"
-            onChange={handleChange}
-            value={formInput.unidadPeso}
-          >
-            <option value="kg">Kgs</option>
-            <option value="lb">Lbs</option>
-            <option value="grm">Grms</option>
-          </select>
-        </div>
+        </Form.Item>
 
         <label htmlFor="precio">Precio Por Peso</label>
-        <input
-          type="number"
+        <Form.Item
+          noStyle
           name="precio"
-          id="precio"
-          onChange={handleChange}
-          value={formInput.precio}
-          step=".1"
-        />
+          rules={[
+            { required: true, message: 'Favor llenar precio por peso' },
+            {
+              type: 'number',
+              min: 0.1,
+              message: 'Favor introducir valor valido en precio.',
+            },
+          ]}
+        >
+          <InputNumber
+            onChange={(value) => {
+              handleChange('precio', value);
+            }}
+            min={0}
+            step={0.1}
+            addonBefore={' $ '}
+          />
+        </Form.Item>
 
-        <Button type="primary" htmlType="submit" style={{ marginTop: '20px' }}>
-          Guardar
-        </Button>
+        <Form.Item noStyle>
+          <Button
+            type="primary"
+            htmlType="submit"
+            style={{ marginTop: '20px' }}
+          >
+            Guardar
+          </Button>
+        </Form.Item>
         <Button onClick={onClose}>Cerrar</Button>
-      </form>
+      </Form>
     </div>
   );
 };

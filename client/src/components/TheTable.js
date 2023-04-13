@@ -12,7 +12,7 @@ import styles from './TheTable.module.css';
 import FilterContext from '../context/Filter.context';
 
 const { confirm } = Modal;
-const TheTable = ({ stocks, onDelete, onClick, onFilter, filterActive }) => {
+const TheTable = ({ stocks, onDelete, onClick, onFilter, onClearFilter }) => {
   const { filterData, setFilterData, isFilterActive, clearFilterData } =
     useContext(FilterContext);
 
@@ -152,7 +152,7 @@ const TheTable = ({ stocks, onDelete, onClick, onFilter, filterActive }) => {
           </div>
           {isFilterActive() && (
             <div>
-              <Button onClick={clearFilterData}>Borrar Filtro</Button>
+              <Button onClick={onClearFilter}>Borrar Filtro</Button>
             </div>
           )}
 

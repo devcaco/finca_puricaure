@@ -16,21 +16,39 @@ import Filter from './components/formularios/Filter';
 import FilterContext from './context/Filter.context';
 
 function App() {
-  const { filterData, setFilterData } = useContext(FilterContext);
+  const { filterData, setFilterData, clearFilterData } =
+    useContext(FilterContext);
 
   const [showModal, setShowModal] = useState(false);
   const [activeForm, setActiveForm] = useState('');
   const [stocks, setStocks] = useState([]);
+  const [originalStock, setOriginalStock] = useState([]);
   const [stockId, setStockId] = useState('');
 
   const fetchStock = async () => {
-    const response = await axios.get(process.env.REACT_APP_API + 'stock/');
-    console.log({ stocksFetched: response.data.stocks });
-    if (response.data.ok) setStocks(response.data.stocks);
+    try {
+      const response = await axios.get(process.env.REACT_APP_API + 'stock/');
+      if (response.data.ok) {
+        console.log({ stocksFetched: response.data.stocks });
+        setStocks(response.data.stocks);
+        setOriginalStock(response.data.stocks);
+
+        // return response.data.stocks;
+      } else {
+        throw new Error(response.data.errorMsg);
+      }
+    } catch (err) {
+      console.log('ERROR -> ', err);
+      // return [];
+    }
   };
 
+  useEffect(() => {
+    fetchStock();
+  }, []);
+
   const filterStock = (filter) => {
-    let filteredStock = [...stocks];
+    let filteredStock = [...originalStock];
     let filtering = false;
 
     if (filter.vendido) {
@@ -144,10 +162,6 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    fetchStock();
-  }, [filterData]);
-
   const handleOnClose = (fetch = false) => {
     setShowModal(false);
     if (fetch) fetchStock();
@@ -192,7 +206,14 @@ function App() {
             <StockDetails onClose={handleOnClose} stockId={stockId} />
           )}
           {activeForm === 'filter' && (
-            <Filter onClose={handleOnClose} onFilter={filterStock} />
+            <Filter
+              onClose={handleOnClose}
+              onFilter={filterStock}
+              onClearFilter={() => {
+                clearFilterData();
+                fetchStock();
+              }}
+            />
           )}
         </Modal>
       )}
@@ -202,6 +223,10 @@ function App() {
         onDelete={deleteStock}
         onClick={handleShowDetails}
         onFilter={handleShowModal}
+        onClearFilter={() => {
+          clearFilterData();
+          fetchStock();
+        }}
         filterActive={false}
       />
     </div>

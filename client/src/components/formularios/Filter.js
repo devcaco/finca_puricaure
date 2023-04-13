@@ -1,14 +1,18 @@
-import React, { useState, useContext } from 'react';
-import { Form, Input, Slider, DatePicker, Select, Button } from 'antd';
+import React, { useContext } from 'react';
+import { Form, Slider, DatePicker, Select, Button } from 'antd';
+import FilterContext from '../../context/Filter.context';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 import styles from './Filter.module.css';
-import dayjs from 'dayjs';
 
-import FilterContext from '../../context/Filter.context';
+dayjs.extend(customParseFormat);
+
+const dateFormatList = ['MM/DD/YYYY', 'MM/DD/YY', 'MM-DD-YYYY', 'MM-DD-YY'];
 
 const { RangePicker } = DatePicker;
 
-const Filter = ({ onClose, onFilter }) => {
+const Filter = ({ onClose, onFilter, onClearFilter }) => {
   const {
     filterData: formData,
     setFilterData: setFormData,
@@ -18,7 +22,6 @@ const Filter = ({ onClose, onFilter }) => {
   const handleChange = (name, val) => {
     switch (name) {
       case 'vendido':
-        // console.log('');
         setFormData((prevState) => ({ ...prevState, vendido: val }));
         break;
       case 'fechaCompra':
@@ -37,8 +40,6 @@ const Filter = ({ onClose, onFilter }) => {
         }));
         break;
       case 'peso':
-        // console.log('SETTING PESO VALUES');
-        // console.log(val[0], val[1]);
         setFormData((prevState) => ({
           ...prevState,
           peso1: val[0],
@@ -67,69 +68,73 @@ const Filter = ({ onClose, onFilter }) => {
         : '',
     };
 
-    console.log({ filter });
-
     onFilter(filter);
   };
   return (
     <section className={styles.filter}>
-      <div>
-        <h2>Filtro</h2>
-      </div>
+      <h2>Filtro</h2>
 
-      <div>
-        <Form onFinish={handleSubmit}>
-          <div>Vendido</div>
-          <div>
-            <Form.Item>
-              <Select
-                onChange={(val) => handleChange('vendido', val)}
-                value={formData.vendido}
-                options={[
-                  { value: '', label: '---------' },
-                  { value: 'vendido', label: 'Vendido con Reposicion' },
-                  { value: 'sinreponer', label: 'Vendido Sin Reposicion' },
-                  { value: 'sinvender', label: 'Sin Vender' },
-                ]}
-              />
-            </Form.Item>
-          </div>
+      <Form
+        onFinish={handleSubmit}
+        initialValues={{
+          vendido: formData.vendido,
+          fechaCompra: [formData.fechaCompra1, formData.fechaCompra2],
+          fechaVenta: [formData.fechaVenta1, formData.fechaVenta2],
+          peso: [formData.peso1, formData.peso2],
+        }}
+      >
+        <div>Vendido</div>
+        <div>
+          <Form.Item name="vendido">
+            <Select
+              onChange={(val) => handleChange('vendido', val)}
+              // value={formData.vendido}
+              options={[
+                { value: '', label: '---------' },
+                { value: 'vendido', label: 'Vendido con reposicion' },
+                { value: 'sinreponer', label: 'Vendido sin reposicion' },
+                { value: 'sinvender', label: 'Sin Vender' },
+              ]}
+            />
+          </Form.Item>
+        </div>
 
-          <div>Fecha Compra</div>
-          <div>
-            <Form.Item>
-              <RangePicker
-                allowEmpty={[false, true]}
-                onChange={(val) => handleChange('fechaCompra', val)}
-                value={[formData.fechaCompra1, formData.fechaCompra2]}
-              />
-            </Form.Item>
-          </div>
+        <div>Fecha Compra</div>
+        <div>
+          <Form.Item name="fechaCompra">
+            <RangePicker
+              format={dateFormatList}
+              allowEmpty={[false, true]}
+              onChange={(val) => handleChange('fechaCompra', val)}
+              // value={[formData.fechaCompra1, formData.fechaCompra2]}
+            />
+          </Form.Item>
+        </div>
 
-          <div>Fecha Venta</div>
-          <div>
-            <Form.Item>
-              <RangePicker
-                allowEmpty={[false, true]}
-                onChange={(val) => handleChange('fechaVenta', val)}
-                value={[formData.fechaVenta1, formData.fechaVenta2]}
-              />
-            </Form.Item>
-          </div>
+        <div>Fecha Venta</div>
+        <div>
+          <Form.Item name="fechaVenta">
+            <RangePicker
+              allowEmpty={[false, true]}
+              onChange={(val) => handleChange('fechaVenta', val)}
+              // value={[formData.fechaVenta1, formData.fechaVenta2]}
+            />
+          </Form.Item>
+        </div>
 
-          <div>Peso</div>
-          <div>
-            <Form.Item>
-              <Slider
-                range
-                min={0}
-                max={600}
-                defaultValue={[0, 0]}
-                onChange={(val) => handleChange('peso', val)}
-                value={[formData.peso1, formData.peso2]}
-              />
-            </Form.Item>
-          </div>
+        <div>Peso</div>
+        <div>
+          <Form.Item name="peso">
+            <Slider
+              range
+              min={0}
+              max={600}
+              onChange={(val) => handleChange('peso', val)}
+              // value={[formData.peso1, formData.peso2]}
+            />
+          </Form.Item>
+        </div>
+        <Form.Item noStyle>
           <Button
             type="primary"
             htmlType="submit"
@@ -137,11 +142,17 @@ const Filter = ({ onClose, onFilter }) => {
           >
             Filtrar
           </Button>
-          <Button style={{ marginTop: '20px' }} onClick={onClose}>
-            Cerrar
-          </Button>
-        </Form>
-      </div>
+        </Form.Item>
+        <Button
+          style={{ marginTop: '20px' }}
+          onClick={() => {
+            onClearFilter();
+            onClose(false);
+          }}
+        >
+          Cerrar
+        </Button>
+      </Form>
     </section>
   );
 };
