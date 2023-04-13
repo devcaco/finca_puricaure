@@ -1,10 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
+import { Modal } from 'antd';
 
 import './App.css';
 import Header from './components/Header';
 import Buttons from './components/Buttons';
-import Modal from './components/ui/Modal';
 
 import Compra from './components/formularios/Compra';
 import Venta from './components/formularios/Venta';
@@ -197,26 +197,29 @@ function App() {
   return (
     <div className="App">
       <Header />
-      {showModal && (
-        <Modal onClose={handleOnClose}>
-          {activeForm === 'compra' && <Compra onClose={handleOnClose} />}
-          {activeForm === 'venta' && <Venta onClose={handleOnClose} />}
-          {activeForm === 'peso' && <Peso onClose={handleOnClose} />}
-          {activeForm === 'details' && (
-            <StockDetails onClose={handleOnClose} stockId={stockId} />
-          )}
-          {activeForm === 'filter' && (
-            <Filter
-              onClose={handleOnClose}
-              onFilter={filterStock}
-              onClearFilter={() => {
-                clearFilterData();
-                fetchStock();
-              }}
-            />
-          )}
-        </Modal>
-      )}
+      <Modal
+        open={showModal}
+        centered
+        onCancel={() => setShowModal(false)}
+        footer={[]}
+      >
+        {activeForm === 'compra' && <Compra onClose={handleOnClose} />}
+        {activeForm === 'venta' && <Venta onClose={handleOnClose} />}
+        {activeForm === 'peso' && <Peso onClose={handleOnClose} />}
+        {activeForm === 'details' && (
+          <StockDetails onClose={handleOnClose} stockId={stockId} />
+        )}
+        {activeForm === 'filter' && (
+          <Filter
+            onClose={handleOnClose}
+            onFilter={filterStock}
+            onClearFilter={() => {
+              clearFilterData();
+              fetchStock();
+            }}
+          />
+        )}
+      </Modal>
       <Buttons onShowModal={handleShowModal} />
       <TheTable
         stocks={stocks}
