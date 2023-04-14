@@ -16,3 +16,10 @@
     text-align: center;
     margin: 0 auto; 
 }
+
+.table__actions {
+    display: flex;
+}
+.table__actions >:first-child {
+    margin-right: 30px;
+}

@@ -24,6 +24,7 @@ function App() {
   const [stocks, setStocks] = useState([]);
   const [originalStock, setOriginalStock] = useState([]);
   const [stockId, setStockId] = useState('');
+  const [lastSelected, setLastSelected] = useState(null);
 
   const fetchStock = async () => {
     try {
@@ -47,7 +48,26 @@ function App() {
     fetchStock();
   }, []);
 
+  useEffect(() => {
+    filterStock(filterData);
+  }, [filterData]);
+
+  const searchStock = (search) => {
+    console.log('SEARCH CHANGED');
+    // let theStocks = [...originalStock];
+
+    // theStocks = theStocks.filter((stock) => {
+    //   // console.log({ eachStock: stock });
+    //   return stock.stockNro.toString().includes(search);
+    // });
+
+    setFilterData((prevState) => {
+      return { ...prevState, search: search };
+    });
+  };
+
   const filterStock = (filter) => {
+    console.log('FILTERING');
     let filteredStock = [...originalStock];
     let filtering = false;
 
@@ -140,12 +160,20 @@ function App() {
       ];
     }
 
-    if (!filtering) {
-      filteredStock = [];
-    } else {
-      setStocks([...filteredStock]);
+    if (filter.search) {
+      console.log({ Searching: filter.search });
+      filtering = true;
+      filteredStock = [
+        ...filteredStock.filter((stock) => {
+          console.log({ eachStock: stock });
+          return stock.stockNro.toString().includes(filter.search);
+        }),
+      ];
     }
-    setShowModal(false);
+
+    setStocks([...filteredStock]);
+
+    // setShowModal(false);
   };
 
   const deleteStock = async (stockArr) => {
@@ -202,10 +230,16 @@ function App() {
         centered
         onCancel={() => setShowModal(false)}
         footer={[]}
+        width={activeForm === 'details' && 750}
+        destroyOnClose={true}
       >
         {activeForm === 'compra' && <Compra onClose={handleOnClose} />}
-        {activeForm === 'venta' && <Venta onClose={handleOnClose} />}
-        {activeForm === 'peso' && <Peso onClose={handleOnClose} />}
+        {activeForm === 'venta' && (
+          <Venta onClose={handleOnClose} selectedStock={lastSelected?._id} />
+        )}
+        {activeForm === 'peso' && (
+          <Peso onClose={handleOnClose} stockId={lastSelected?._id} />
+        )}
         {activeForm === 'details' && (
           <StockDetails onClose={handleOnClose} stockId={stockId} />
         )}
@@ -220,7 +254,7 @@ function App() {
           />
         )}
       </Modal>
-      <Buttons onShowModal={handleShowModal} />
+      <Buttons onShowModal={handleShowModal} isValid={!!lastSelected} />
       <TheTable
         stocks={stocks}
         onDelete={deleteStock}
@@ -230,6 +264,10 @@ function App() {
           clearFilterData();
           fetchStock();
         }}
+        onLastSelected={(stock) => {
+          setLastSelected(stock[0]?.venta?.fecha ? null : stock[0]);
+        }}
+        onSearch={searchStock}
         filterActive={false}
       />
     </div>

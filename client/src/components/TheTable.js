@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Table, Modal, Button } from 'antd';
-
+import { Table, Modal, Button, Input } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import {
   CheckSquareOutlined,
   ExclamationCircleFilled,
@@ -12,7 +12,15 @@ import styles from './TheTable.module.css';
 import FilterContext from '../context/Filter.context';
 
 const { confirm } = Modal;
-const TheTable = ({ stocks, onDelete, onClick, onFilter, onClearFilter }) => {
+const TheTable = ({
+  stocks,
+  onDelete,
+  onClick,
+  onFilter,
+  onClearFilter,
+  onLastSelected,
+  onSearch,
+}) => {
   const { filterData, setFilterData, isFilterActive, clearFilterData } =
     useContext(FilterContext);
 
@@ -76,7 +84,6 @@ const TheTable = ({ stocks, onDelete, onClick, onFilter, onClearFilter }) => {
       key: 'precioTotal',
       render: (compra) => (
         <>
-          {' '}
           {'$ ' +
             (compra.peso ? compra.peso.peso * compra.precio : 0)
               .toFixed(2)
@@ -127,7 +134,9 @@ const TheTable = ({ stocks, onDelete, onClick, onFilter, onClearFilter }) => {
       setSelectedRows(selectedRowKeys);
     },
     onSelect: (record, selected, selectedRows) => {
-      console.log(record, selected, selectedRows);
+      console.log({ record, selected, selectedRows });
+
+      onLastSelected(selectedRows);
     },
     onSelectAll: (selected, selectedRows, changeRows) => {
       console.log(selected, selectedRows, changeRows);
@@ -137,18 +146,25 @@ const TheTable = ({ stocks, onDelete, onClick, onFilter, onClearFilter }) => {
     <>
       <div className={styles.table}>
         <div className={styles.header}>
-          <div>
-            {stocks.length > 0 && (
-              <Button
-                danger
-                type="primary"
-                icon={<DeleteOutlined />}
-                disabled={!selectedRows.length ? 'disabled' : ''}
-                onClick={showConfirm}
-              >
-                Borrar
-              </Button>
-            )}
+          <div className={styles.table__actions}>
+            <Button
+              danger
+              type="primary"
+              icon={<DeleteOutlined />}
+              disabled={!selectedRows.length ? 'disabled' : ''}
+              onClick={showConfirm}
+            >
+              Borrar
+            </Button>
+            <Input
+              name="search"
+              placeholder="Buscar por Nro"
+              allowClear={true}
+              addonBefore={<SearchOutlined />}
+              onChange={(e) => {
+                onSearch(e.target.value);
+              }}
+            />
           </div>
           {isFilterActive() && (
             <div>
@@ -164,7 +180,9 @@ const TheTable = ({ stocks, onDelete, onClick, onFilter, onClearFilter }) => {
           columns={columns}
           rowKey={(record) => record._id}
           dataSource={stocks}
-          pagination={false}
+          pagination={{
+            defaultPageSize: 20,
+          }}
           rowSelection={{ ...rowSelection }}
         />
       </div>

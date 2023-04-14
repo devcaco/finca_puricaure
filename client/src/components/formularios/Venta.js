@@ -9,7 +9,7 @@ import styles from './venta.module.css';
 dayjs.extend(customParseFormat);
 const dateFormatList = ['MM/DD/YYYY', 'MM/DD/YY', 'MM-DD-YYYY', 'MM-DD-YY'];
 
-const Venta = ({ onClose }) => {
+const Venta = ({ onClose, selectedStock }) => {
   const [stocks, setStocks] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
   const [form] = Form.useForm();
@@ -33,7 +33,8 @@ const Venta = ({ onClose }) => {
 
   useEffect(() => {
     fetchStock();
-  }, []);
+    console.log({ selectedStock });
+  }, [selectedStock]);
 
   const handleFormError = (formError) => {
     setErrorMsg('Formulario Invalido');
@@ -76,7 +77,7 @@ const Venta = ({ onClose }) => {
         onFinishFailed={handleFormError}
         initialValues={{
           fechaVenta: dayjs(),
-          nroStock: '',
+          nroStock: selectedStock ?? '',
           pesoSalida: 0,
           unidadPeso: 'kg',
           precio: 0,

@@ -51,24 +51,26 @@ const Filter = ({ onClose, onFilter, onClearFilter }) => {
     }
   };
   const handleSubmit = () => {
-    let filter = JSON.parse(JSON.stringify(formData));
-    filter = {
-      ...filter,
-      fechaCompra1: filter.fechaCompra1
-        ? new Date(dayjs(filter.fechaCompra1).format())
-        : '',
-      fechaCompra2: filter.fechaCompra2
-        ? new Date(dayjs(filter.fechaCompra2).format())
-        : '',
-      fechaVenta1: filter.fechaVenta1
-        ? new Date(dayjs(filter.fechaVenta1).format())
-        : '',
-      fechaVenta2: filter.fechaVenta2
-        ? new Date(dayjs(filter.fechaVenta2).format())
-        : '',
-    };
+    // let filter = JSON.parse(JSON.stringify(formData));
+    // filter = {
+    //   ...filter,
+    //   fechaCompra1: filter.fechaCompra1
+    //     ? new Date(dayjs(filter.fechaCompra1).format())
+    //     : '',
+    //   fechaCompra2: filter.fechaCompra2
+    //     ? new Date(dayjs(filter.fechaCompra2).format())
+    //     : '',
+    //   fechaVenta1: filter.fechaVenta1
+    //     ? new Date(dayjs(filter.fechaVenta1).format())
+    //     : '',
+    //   fechaVenta2: filter.fechaVenta2
+    //     ? new Date(dayjs(filter.fechaVenta2).format())
+    //     : '',
+    // };
 
-    onFilter(filter);
+    // onFilter(filter);
+    console.log('CLOSING FILTER SUBMIT')
+    onClose(false);
   };
   return (
     <section className={styles.filter}>
