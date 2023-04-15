@@ -56,7 +56,7 @@ const TheTable = ({
       },
       render: (stockNro, record) => (
         <>
-          <a onClick={() => handleDetails(record._id)}>{stockNro}</a>
+          <Button type='link' onClick={() => handleDetails(record._id)}>{stockNro}</Button>
         </>
       ),
     },
@@ -64,6 +64,11 @@ const TheTable = ({
       title: 'Lote',
       dataIndex: 'loteNro',
       key: 'loteNro',
+      sorter: (a, b) => {
+        a = !!(+a.loteNro + 1) ? +a.stockNro : 99999;
+        b = !!(+b.loteNro + 1) ? +b.stockNro : 99999;
+        return a - b;
+      },
     },
     {
       title: 'Fecha Compra',

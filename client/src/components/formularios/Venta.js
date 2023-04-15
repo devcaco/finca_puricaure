@@ -33,7 +33,6 @@ const Venta = ({ onClose, selectedStock }) => {
 
   useEffect(() => {
     fetchStock();
-    console.log({ selectedStock });
   }, [selectedStock]);
 
   const handleFormError = (formError) => {
@@ -77,8 +76,8 @@ const Venta = ({ onClose, selectedStock }) => {
         onFinishFailed={handleFormError}
         initialValues={{
           fechaVenta: dayjs(),
-          nroStock: selectedStock ?? '',
-          pesoSalida: 0,
+          nroStock: selectedStock?._id ?? '',
+          pesoSalida: selectedStock?.pesos[0]?.peso,
           unidadPeso: 'kg',
           precio: 0,
         }}
@@ -151,7 +150,10 @@ const Venta = ({ onClose, selectedStock }) => {
             min={1}
             addonAfter={
               <Select
+                style={{minWidth: '50px'}}
                 name="unidadPeso"
+                defaultValue={'kg'}
+                size='small'
                 onChange={(value) => {
                   handleChange('unidadPeso', value);
                 }}

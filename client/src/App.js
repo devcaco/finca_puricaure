@@ -207,10 +207,14 @@ function App() {
       >
         {activeForm === 'compra' && <Compra onClose={handleOnClose} />}
         {activeForm === 'venta' && (
-          <Venta onClose={handleOnClose} selectedStock={lastSelected?._id} />
+          <Venta onClose={handleOnClose} selectedStock={lastSelected} />
         )}
         {activeForm === 'peso' && (
-          <Peso onClose={handleOnClose} stockId={lastSelected?._id} />
+          <Peso
+            onClose={handleOnClose}
+            selectedStock={lastSelected}
+            stockId={lastSelected?._id}
+          />
         )}
         {activeForm === 'details' && (
           <StockDetails onClose={handleOnClose} stockId={stockId} />

@@ -9,7 +9,7 @@ import styles from './peso.module.css';
 dayjs.extend(customParseFormat);
 const dateFormatList = ['MM/DD/YYYY', 'MM/DD/YY', 'MM-DD-YYYY', 'MM-DD-YY'];
 
-const Peso = ({ onClose }) => {
+const Peso = ({ onClose, selectedStock }) => {
   const [errorMsg, setErrorMsg] = useState('');
   const [stocks, setStocks] = useState([]);
 
@@ -31,7 +31,8 @@ const Peso = ({ onClose }) => {
 
   useEffect(() => {
     fetchStock();
-  }, []);
+    console.log({selectedStock})
+  }, [selectedStock]);
 
   const handleFormError = (formError) => {
     console.log({ formError });
@@ -77,8 +78,8 @@ const Peso = ({ onClose }) => {
         form={form}
         initialValues={{
           fecha: dayjs(),
-          peso: 0,
-          nroStock: '',
+          peso: selectedStock.pesos[0]?.peso ?? 0,
+          nroStock: selectedStock?._id ?? '',
         }}
       >
         <label htmlFor="fecha">Fecha</label>
