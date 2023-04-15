@@ -13,6 +13,8 @@ export const FilterProvider = ({ children }) => {
     peso2: 0,
   });
   const [filterActive, setFilterActive] = useState(false);
+  const [filterSearch, setFilterSearch] = useState(null);
+  const [sortOptions, setSortOptions] = useState(null);
 
   const isFilterActive = () => {
     if (
@@ -22,7 +24,9 @@ export const FilterProvider = ({ children }) => {
       filterData.fechaVenta1 ||
       filterData.fechaVenta2 ||
       filterData.peso1 ||
-      filterData.peso2
+      filterData.peso2 ||
+      filterSearch ||
+      sortOptions
     ) {
       return true;
     }
@@ -30,6 +34,8 @@ export const FilterProvider = ({ children }) => {
   };
 
   const clearFilterData = () => {
+    setFilterSearch(null);
+    setSortOptions(null);
     setFilterData({
       vendido: '',
       fechaCompra1: '',
@@ -45,11 +51,15 @@ export const FilterProvider = ({ children }) => {
       <FilterContext.Provider
         value={{
           filterData,
-          setFilterData,
+          filterSearch,
+          sortOptions,
           filterActive,
+          setFilterData,
           setFilterActive,
+          setFilterSearch,
+          setSortOptions,
           isFilterActive,
-          clearFilterData
+          clearFilterData,
         }}
       >
         {children}

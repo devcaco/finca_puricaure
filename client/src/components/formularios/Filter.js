@@ -12,10 +12,11 @@ const dateFormatList = ['MM/DD/YYYY', 'MM/DD/YY', 'MM-DD-YYYY', 'MM-DD-YY'];
 
 const { RangePicker } = DatePicker;
 
-const Filter = ({ onClose, onFilter, onClearFilter }) => {
+const Filter = ({ onClose }) => {
   const {
     filterData: formData,
     setFilterData: setFormData,
+    clearFilterData,
     isFilterActive,
   } = useContext(FilterContext);
 
@@ -25,7 +26,6 @@ const Filter = ({ onClose, onFilter, onClearFilter }) => {
         setFormData((prevState) => ({ ...prevState, vendido: val }));
         break;
       case 'fechaCompra':
-        // if (val && val[0]) console.log({ fecha: dayjs(val[0]).format() });
         setFormData((prevState) => ({
           ...prevState,
           fechaCompra1: val && val[0] ? val[0] : '',
@@ -51,25 +51,6 @@ const Filter = ({ onClose, onFilter, onClearFilter }) => {
     }
   };
   const handleSubmit = () => {
-    // let filter = JSON.parse(JSON.stringify(formData));
-    // filter = {
-    //   ...filter,
-    //   fechaCompra1: filter.fechaCompra1
-    //     ? new Date(dayjs(filter.fechaCompra1).format())
-    //     : '',
-    //   fechaCompra2: filter.fechaCompra2
-    //     ? new Date(dayjs(filter.fechaCompra2).format())
-    //     : '',
-    //   fechaVenta1: filter.fechaVenta1
-    //     ? new Date(dayjs(filter.fechaVenta1).format())
-    //     : '',
-    //   fechaVenta2: filter.fechaVenta2
-    //     ? new Date(dayjs(filter.fechaVenta2).format())
-    //     : '',
-    // };
-
-    // onFilter(filter);
-    console.log('CLOSING FILTER SUBMIT')
     onClose(false);
   };
   return (
@@ -148,11 +129,11 @@ const Filter = ({ onClose, onFilter, onClearFilter }) => {
         <Button
           style={{ marginTop: '20px' }}
           onClick={() => {
-            onClearFilter();
+            clearFilterData();
             onClose(false);
           }}
         >
-          Cerrar
+          Resetear Filtro
         </Button>
       </Form>
     </section>

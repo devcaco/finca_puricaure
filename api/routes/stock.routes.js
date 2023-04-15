@@ -16,7 +16,7 @@ router.get('/nro', async (req, res, next) => {
   try {
     const response = await Stock.findOne().sort({ stockNro: -1 });
     const stockNro =
-      response && response.stockNro ? response.stockNro + 1 : 1001;
+      response && response.stockNro ? +response.stockNro + 1 : 1001;
 
     res.status(200).json({ ok: true, stockNro });
   } catch (err) {
@@ -99,8 +99,8 @@ router.post('/', async (req, res, next) => {
     });
 
     const stock = await Stock.create({
-      stockNro: data.nroStock,
-      loteNro: data.nroLote,
+      stockNro: data?.nroStock?.toString(),
+      loteNro: data?.nroLote?.toString(),
       compra: {
         fecha: new Date(data.fecha.replace(/-/g, '/').replace(/T.+/, '')),
         peso: peso._id,

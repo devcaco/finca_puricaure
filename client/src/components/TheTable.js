@@ -15,13 +15,11 @@ const { confirm } = Modal;
 const TheTable = ({
   stocks,
   onDelete,
+  openFilter,
   onClick,
-  onFilter,
-  onClearFilter,
   onLastSelected,
-  onSearch,
 }) => {
-  const { filterData, setFilterData, isFilterActive, clearFilterData } =
+  const { filterSearch, setFilterSearch, isFilterActive, clearFilterData } =
     useContext(FilterContext);
 
   const [selectedRows, setSelectedRows] = useState([]);
@@ -49,6 +47,13 @@ const TheTable = ({
       title: 'Nro',
       dataIndex: 'stockNro',
       key: 'stockNro',
+      sorter: (a, b) => {
+        // if (!+a.stockNro) console.log(a.stockNro);
+        // return a.stockNro.toString().length - b.stockNro.toString().length;
+        a = !!(+a.stockNro + 1) ? +a.stockNro : 99999;
+        b = !!(+b.stockNro + 1) ? +b.stockNro : 99999;
+        return a - b;
+      },
       render: (stockNro, record) => (
         <>
           <a onClick={() => handleDetails(record._id)}>{stockNro}</a>
@@ -71,12 +76,14 @@ const TheTable = ({
       dataIndex: 'compra',
       key: 'precioCompra',
       render: (compra) => <>{'$ ' + compra.precio.toFixed(2)}</>,
+      responsive: ['md'],
     },
     {
       title: 'Peso Compra',
       dataIndex: 'compra',
       key: 'pesoCompra',
       render: (compra) => <>{compra.peso ? compra.peso.peso + ' kgs' : ''}</>,
+      responsive: ['md'],
     },
     {
       title: 'Precio Total',
@@ -90,6 +97,7 @@ const TheTable = ({
               .toLocaleString(undefined, { maximumFractionDigits: 2 })}
         </>
       ),
+      responsive: ['md'],
     },
     {
       title: 'Ultimo Peso',
@@ -103,6 +111,7 @@ const TheTable = ({
       title: 'Vendido',
       dataIndex: 'venta',
       key: 'venta',
+      responsive: ['md'],
       render: (venta, rows) => {
         return (
           <>
@@ -158,22 +167,29 @@ const TheTable = ({
             </Button>
             <Input
               name="search"
+              value={filterSearch}
               placeholder="Buscar por Nro"
               allowClear={true}
               addonBefore={<SearchOutlined />}
               onChange={(e) => {
-                onSearch(e.target.value);
+                setFilterSearch(e.target.value);
               }}
             />
           </div>
           {isFilterActive() && (
             <div>
-              <Button onClick={onClearFilter}>Borrar Filtro</Button>
+              <Button
+                onClick={() => {
+                  clearFilterData();
+                }}
+              >
+                Borrar Filtro
+              </Button>
             </div>
           )}
 
           <div>
-            <Button onClick={() => onFilter('filter')}>Filtrar</Button>
+            <Button onClick={() => openFilter('filter')}>Filtrar</Button>
           </div>
         </div>
         <Table

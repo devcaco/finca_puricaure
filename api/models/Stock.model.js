@@ -17,12 +17,12 @@ const { Schema, model } = require('mongoose');
 const stockSchema = new Schema(
   {
     stockNro: {
-      type: Number,
+      type: String,
       required: [true, 'Nro de Referencia es requerido'],
       unique: true,
     },
     loteNro: {
-      type: Number,
+      type: String,
       required: true,
       unique: false,
     },
