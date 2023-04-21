@@ -1,6 +1,15 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { Button, Form, InputNumber, Select, DatePicker, Switch } from 'antd';
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  DatePicker,
+  Switch,
+  Tooltip,
+} from 'antd';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import styles from './compra.module.css';
@@ -9,30 +18,14 @@ dayjs.extend(customParseFormat);
 const dateFormatList = ['MM/DD/YYYY', 'MM/DD/YY', 'MM-DD-YYYY', 'MM-DD-YY'];
 
 const Compra = ({ onClose }) => {
-  const [form] = Form.useForm();
-
-  const [isReposicion, setIsReposicion] = useState(false);
+  const [isReposicion, setIsReposicion] = useState(true);
   const [stockReposicion, setStockReposicion] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
+  const [nroSerial, setNroSerial] = useState('');
+
+  const [form] = Form.useForm();
 
   useEffect(() => {
-    const getStockNro = async () => {
-      try {
-        const response = await axios.get(
-          process.env.REACT_APP_API + 'stock/nro'
-        );
-
-        if (response.data.ok) {
-          form.setFieldsValue({
-            nroStock: await response.data.stockNro,
-          });
-        } else throw new Error(response.data.errorMsg);
-      } catch (err) {
-        console.log('error', err);
-        return 1001;
-      }
-    };
-
     const getStockReposicion = async () => {
       try {
         const response = await axios.get(
@@ -49,7 +42,6 @@ const Compra = ({ onClose }) => {
       }
     };
 
-    getStockNro();
     getStockReposicion();
   }, [form]);
 
@@ -71,9 +63,9 @@ const Compra = ({ onClose }) => {
         throw new Error('Favor llenar campos requeridos');
       }
 
-      if (isReposicion && !formInput.stockReposicion) {
-        throw new Error('Favor seleccionar la reposicion');
-      }
+      // if (isReposicion && !formInput.stockReposicion) {
+      //   throw new Error('Favor seleccionar la reposicion');
+      // }
 
       const response = await axios.post(
         process.env.REACT_APP_API + 'stock/',
@@ -91,20 +83,39 @@ const Compra = ({ onClose }) => {
 
   const handleChange = (name, value) => {
     setErrorMsg('');
+
+    let nroSerial = '';
+    const nroStock = form.getFieldValue('nroStock');
+    const nroLote = form.getFieldValue('nroLote');
+
+    console.log(nroStock, nroLote);
+
+    if (nroStock && nroLote) {
+      nroSerial = nroStock.toString().trim() + '-' + nroLote.toString().trim();
+      setNroSerial(nroSerial);
+    }
   };
 
   return (
     <div className={styles.form}>
-      <h2>Formulario de Entrada</h2>
+      <h2>
+        Formulario de Entrada <br />
+        {nroSerial}
+      </h2>
       {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
       <Form
+        layout="horizontal"
+        labelCol={{ span: 9 }}
+        labelAlign="left"
         name="compraForm"
+        wrapperCol={{ offset: 0 }}
         form={form}
         onFinish={handleSubmit}
         onFinishFailed={handleFormError}
+        requiredMark={false}
         initialValues={{
           fecha: dayjs(),
-          nroStock: 2002,
+          nroStock: 0,
           nroLote: 0,
           pesoEntrada: 0,
           unidadPeso: 'kg',
@@ -112,11 +123,15 @@ const Compra = ({ onClose }) => {
           stockReposicion: '',
         }}
       >
-        <label htmlFor="fecha">Fecha Compra</label>
+        {/* <label htmlFor="fecha">Fecha Compra</label> */}
         <Form.Item
+          // noStyle
+          label="Fecha Compra"
           name="fecha"
           rules={[{ required: true, message: 'Favor llenar fecha de compra' }]}
-          noStyle
+          help={''}
+
+          // noStyle
         >
           <DatePicker
             format={dateFormatList}
@@ -124,47 +139,46 @@ const Compra = ({ onClose }) => {
               // console.log({ theDate: date });
               handleChange('fecha', dayjs(date, dateFormatList[0]));
             }}
+            style={{ width: '100%' }}
           />
         </Form.Item>
-        <label htmlFor="nroStock">Nro de Stock</label>
+        {/* <label htmlFor="nroStock">Nro de Stock</label> */}
         <Form.Item
-          noStyle
+          // noStyle
+          label="Nro de Stock"
           name="nroStock"
           rules={[
             {
               required: true,
-              message: 'Favor llenar Nro de Stock',
-            },
-            {
-              type: 'integer',
-              min: 1,
-              message: 'Favor introducir valor valido en nroStock.',
+              message: 'Favor introducir el Nro de stock',
             },
           ]}
+          help={''}
         >
-          <InputNumber
+          <Input
+            style={{ width: '100%' }}
             onChange={(value) => {
               handleChange('nroStock', value);
             }}
-            step={1}
-            min={1}
           />
         </Form.Item>
 
-        <label htmlFor="nroLote">Nro de Lote</label>
+        {/* <label htmlFor="nroLote">Nro de Lote</label> */}
         <Form.Item
-          noStyle
+          // noStyle
+          label="Nro de Lote"
           name="nroLote"
           rules={[
-            { required: true, message: 'Favor llenar Nro de Lote' },
+            { required: true, message: '' },
             {
               type: 'integer',
               min: 1,
-              message: 'Favor introducir valor valido en nroLote.',
+              message: '',
             },
           ]}
         >
           <InputNumber
+            style={{ width: '100%' }}
             onChange={(value) => {
               handleChange('nroLote', value);
             }}
@@ -173,16 +187,17 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
 
-        <label htmlFor="pesoEntrada">Peso Entrada</label>
+        {/* <label htmlFor="pesoEntrada">Peso Entrada</label> */}
         <Form.Item
-          noStyle
+          // noStyle
+          label="Peso Entrada"
           name="pesoEntrada"
           rules={[
-            { required: true, message: 'Favor llenar Peso de entrada' },
+            { required: true, message: '' },
             {
               type: 'number',
               min: 0.5,
-              message: 'Favor introducir valor valido en pesoEntrada.',
+              message: '',
             },
           ]}
         >
@@ -190,11 +205,13 @@ const Compra = ({ onClose }) => {
             onChange={(value) => {
               handleChange('pesoEntrada', value);
             }}
+            style={{ width: '100%' }}
             step={1}
             min={1}
             addonAfter={
               <Select
                 name="unidadPeso"
+                defaultValue="kg"
                 onChange={(value) => {
                   handleChange('unidadPeso', value);
                 }}
@@ -216,20 +233,22 @@ const Compra = ({ onClose }) => {
             }
           />
         </Form.Item>
-        <label htmlFor="precio">Precio Por Peso</label>
+        {/* <label htmlFor="precio">Precio Por Peso</label> */}
         <Form.Item
-          noStyle
+          // noStyle
+          label="Precio Por Peso"
           name="precio"
           rules={[
             { required: true, message: 'Favor llenar precio por peso' },
             {
               type: 'number',
               min: 0.1,
-              message: 'Favor introducir valor valido en precio.',
+              message: '',
             },
           ]}
         >
           <InputNumber
+            style={{ width: '100%' }}
             onChange={(value) => {
               handleChange('precio', value);
             }}
@@ -239,62 +258,70 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
 
-        <label htmlFor="reposicion">Reposicion?</label>
-        <div>
-          <span></span>
-          <Form.Item name="reposicion" noStyle>
-            <Switch
-              checked={isReposicion ? true : false}
-              onChange={(checked) => {
-                setIsReposicion(checked);
-              }}
-              style={{ marginRight: '20px' }}
-            />
-          </Form.Item>
-          <Form.Item
-            noStyle
-            name="stockReposicion"
-            rules={[
+        {/* <label htmlFor="reposicion">Reposicion?</label> */}
+        {/* <div>
+          <span></span> */}
+        {/* <Form.Item label="Reposicion?">
+            <Form.Item noStyle name="reposicion">
+              <Switch
+                checked={isReposicion ? true : false}
+                onChange={(checked) => {
+                  setIsReposicion(checked);
+                }}
+                style={{ marginRight: '2rem' }}
+              />
+            </Form.Item> */}
+        <Form.Item name="stockReposicion" label="Reposicion?">
+          <Select
+            placeholder={'Nro de Stock'}
+            showSearch
+            optionFilterProp="children"
+            onChange={(value) => {
+              handleChange('stockReposicion', value);
+            }}
+            disabled={isReposicion && stockReposicion.length ? false : true}
+            filterOption={(input, option) =>
+              (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+            }
+            options={[
               {
-                required: isReposicion ? true : false,
-                message: 'Favor seleccionar Stock de Reposicion',
+                value: '',
+                label: '-------',
               },
+              ...stockReposicion.map((stock) => ({
+                key: `${stock._id}`,
+                value: `${stock._id}`,
+                label: `${stock.stockNro}`,
+              })),
             ]}
+          />
+        </Form.Item>
+        {/* </Form.Item> */}
+        {/* <Form.Item
+          noStyle
+          name="stockReposicion"
+          rules={[
+            {
+              required: isReposicion ? true : false,
+              message: 'Favor seleccionar Stock de Reposicion',
+            },
+          ]}
+        ></Form.Item> */}
+        {/* </div> */}
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            style={{ marginTop: '20px', width: '100%' }}
           >
-            <Select
-              style={{ minWidth: '200px' }}
-              placeholder={'Nro de Stock'}
-              showSearch
-              optionFilterProp="children"
-              onChange={(value) => {
-                handleChange('stockReposicion', value);
-              }}
-              disabled={isReposicion && stockReposicion.length ? false : true}
-              filterOption={(input, option) =>
-                (option?.label ?? '')
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
-              options={[
-                {
-                  value: '',
-                  label: '-------',
-                },
-                ...stockReposicion.map((stock) => ({
-                  key: `${stock._id}`,
-                  value: `${stock._id}`,
-                  label: `${stock.stockNro}`,
-                })),
-              ]}
-            />
-          </Form.Item>
-        </div>
-
-        <span></span>
-        <Button type="primary" htmlType="submit" style={{ marginTop: '20px' }}>
-          Guardar
-        </Button>
-        <Button onClick={onClose}>Cerrar</Button>
+            Guardar
+          </Button>
+        </Form.Item>
+        <Form.Item>
+          <Button onClick={onClose} style={{ width: '100%' }}>
+            Cerrar
+          </Button>
+        </Form.Item>
       </Form>
     </div>
   );

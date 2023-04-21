@@ -9,7 +9,7 @@ const pesoSchema = new Schema(
     stock: {
       type: Schema.Types.ObjectId,
       ref: 'Stock',
-      required: false,
+      required: true,
     },
     tipo: {
       type: String,
@@ -21,7 +21,6 @@ const pesoSchema = new Schema(
     unidad: { type: String, enum: ['kg', 'grm', 'lb'], default: 'kg' },
   },
   {
-    // this second object adds extra properties: `createdAt` and `updatedAt`
     timestamps: true,
   }
 );

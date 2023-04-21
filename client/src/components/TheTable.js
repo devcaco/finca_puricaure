@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
+import axios from 'axios';
 import { Table, Modal, Button, Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import {
@@ -56,7 +57,9 @@ const TheTable = ({
       },
       render: (stockNro, record) => (
         <>
-          <Button type='link' onClick={() => handleDetails(record._id)}>{stockNro}</Button>
+          <Button type="link" onClick={() => handleDetails(record._id)}>
+            {stockNro}
+          </Button>
         </>
       ),
     },
@@ -123,7 +126,7 @@ const TheTable = ({
             {venta && (
               <CheckSquareOutlined
                 className={styles.vendido}
-                style={{ color: rows.reposicion ? 'green' : 'orange' }}
+                style={{ color: rows.venta.reposicion ? 'green' : 'orange' }}
               />
             )}
           </>
@@ -138,24 +141,32 @@ const TheTable = ({
     onClick(id);
   };
 
+  const exportData = async () => {
+    try {
+      const response = await axios.post(
+        process.env.REACT_APP_API + 'stock/export',
+        { data: stocks }
+      );
+
+      if (!response.data.ok) throw new Error(response.data.errorMsg);
+      else window.open(process.env.REACT_APP_API + 'stock/export');
+    } catch (err) {
+      console.log('ERROR -> ', err);
+    }
+  };
+
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        'selectedRows: ',
-        selectedRows
-      );
       setSelectedRows(selectedRowKeys);
     },
     onSelect: (record, selected, selectedRows) => {
-      console.log({ record, selected, selectedRows });
-
       onLastSelected(selectedRows);
     },
     onSelectAll: (selected, selectedRows, changeRows) => {
-      console.log(selected, selectedRows, changeRows);
+      // console.log(selected, selectedRows, changeRows);
     },
   };
+
   return (
     <>
       <div className={styles.table}>
@@ -179,6 +190,7 @@ const TheTable = ({
               onChange={(e) => {
                 setFilterSearch(e.target.value);
               }}
+              className={styles.hidden}
             />
           </div>
           {isFilterActive() && (
@@ -194,7 +206,13 @@ const TheTable = ({
           )}
 
           <div>
-            <Button onClick={() => openFilter('filter')}>Filtrar</Button>
+            <Button
+              onClick={() => openFilter('filter')}
+              style={{ marginRight: '20px' }}
+            >
+              Filtrar
+            </Button>
+            <Button onClick={() => exportData()}>Exportar</Button>
           </div>
         </div>
         <Table
@@ -203,6 +221,8 @@ const TheTable = ({
           dataSource={stocks}
           pagination={{
             defaultPageSize: 20,
+            total: stocks.length,
+            showTotal: (total) => `Total ${total} `,
           }}
           rowSelection={{ ...rowSelection }}
         />

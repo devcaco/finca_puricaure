@@ -1,26 +1,14 @@
 const router = require('express').Router();
 const Stock = require('../models/Stock.model');
 const Peso = require('../models/Peso.model');
+const exportToExcel = require('../utils/exportToExcel');
 
 router.get('/', async (req, res, next) => {
   try {
-    const response = await Stock.find();
-    res.status(200).json({ ok: true, stocks: response });
+    const theList = await Stock.find();
+    res.status(200).json({ ok: true, stocks: theList });
   } catch (err) {
     console.log('ERROR -> ', err);
-    res.status(200).json({ ok: false, errorMsg: err.message });
-  }
-});
-
-router.get('/nro', async (req, res, next) => {
-  try {
-    const response = await Stock.findOne().sort({ stockNro: -1 });
-    const stockNro =
-      response && response.stockNro ? +response.stockNro + 1 : 1001;
-
-    res.status(200).json({ ok: true, stockNro });
-  } catch (err) {
-    console.log('ERROR - > ', err.message);
     res.status(200).json({ ok: false, errorMsg: err.message });
   }
 });
@@ -47,6 +35,18 @@ router.get('/stockReposicion', async (req, res, next) => {
   }
 });
 
+router.get('/loteNros', async (req, res, next) => {
+  try {
+    const response = await Stock.distinct('loteNro');
+
+    console.log({ response });
+    if (response) res.json({ ok: true, loteNros: response });
+  } catch (err) {
+    console.log('ERROR -> ', err);
+    res.status(200).json({ ok: false, errorMsg: err.message });
+  }
+});
+
 router.get('/stockVenta', async (req, res, next) => {
   try {
     const response = await Stock.find({
@@ -69,9 +69,10 @@ router.get('/details/:id', async (req, res, next) => {
         options: { sort: { fecha: 1, createdAt: 1 } },
         select: ['peso', 'fecha'],
       })
-      .populate('reposicion')
+      .populate('compra.reposicion')
       .populate('compra.peso')
-      .populate('venta.peso');
+      .populate('venta.peso')
+      .populate('venta.reposicion');
 
     console.log({ response });
     if (!response) throw new Error('Invalid Stock ID Provided');
@@ -86,48 +87,54 @@ router.get('/details/:id', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
   try {
     const data = req.body;
-    const stockNro =
-      (await Stock.findOne({ stockNro: data.nroStock })) || false;
+    console.log({ data });
+    const serialNro =
+      data.nroStock.toString().trim() + '-' + data.nroLote.toString().trim();
+    const isSerial = (await Stock.findOne({ serialNro: serialNro })) || false;
 
-    if (stockNro) throw new Error('Nro de Stock ya existe!');
+    if (isSerial) throw new Error('Nro de Serial ya existe!');
 
-    const peso = await Peso.create({
+    if (!data.nroStock || !data.nroLote || !data.fecha || !+data.precio)
+      throw new Error('Campos Invalidos');
+
+    const newStock = await Stock.create({
+      serialNro: serialNro,
+      stockNro: data?.nroStock?.toString(),
+      loteNro: data?.nroLote?.toString(),
+      compra: {
+        fecha: new Date(data.fecha.replace(/-/g, '/').replace(/T.+/, '')),
+        peso: null,
+        precio: data.precio,
+        reposicion: !!data.stockReposicion ? data.stockReposicion : null,
+      },
+      venta: {},
+      pesos: [],
+    });
+
+    const newPeso = await Peso.create({
       fecha: new Date(data.fecha.replace(/-/g, '/').replace(/T.+/, '')),
+      stock: newStock._id,
       tipo: 'compra',
       peso: data.pesoEntrada,
       unidad: 'kg',
     });
 
-    const stock = await Stock.create({
-      stockNro: data?.nroStock?.toString(),
-      loteNro: data?.nroLote?.toString(),
-      compra: {
-        fecha: new Date(data.fecha.replace(/-/g, '/').replace(/T.+/, '')),
-        peso: peso._id,
-        precio: data.precio,
-      },
-      venta: {},
-      pesos: [peso._id],
-      reposicion: null,
+    const assignPesoToStock = await Stock.findByIdAndUpdate(newStock._id, {
+      $push: { pesos: newPeso._id },
+      $set: { 'compra.peso': newPeso._id },
     });
 
     if (data.stockReposicion) {
-      const updatedStock = await Stock.findByIdAndUpdate(
+      const setReposicionVenta = await Stock.findByIdAndUpdate(
         data.stockReposicion,
         {
-          reposicion: stock._id,
+          $set: { 'venta.reposicion': newStock._id },
         },
         { new: true }
       );
     }
 
-    const updatePeso = await Peso.findByIdAndUpdate(
-      peso._id,
-      { stock: stock._id },
-      { new: true }
-    );
-
-    res.status(200).json({ ok: true, peso, stock });
+    res.status(200).json({ ok: true, newPeso, newStock });
   } catch (err) {
     console.log('ERROR -> ', err);
     res.status(200).json({ ok: false, errorMsg: err.message });
@@ -138,16 +145,17 @@ router.post('/venta', async (req, res, next) => {
   try {
     const data = req.body;
 
-    const peso = await Peso.create({
+    const newPeso = await Peso.create({
       fecha: new Date(
         req.body.fechaVenta.replace(/-/g, '/').replace(/T.+/, '')
       ),
+      stock: data.nroStock,
       tipo: 'venta',
       peso: req.body.pesoSalida,
       unidad: 'kg',
     });
 
-    const stock = await Stock.findByIdAndUpdate(
+    const updatedStock = await Stock.findByIdAndUpdate(
       data.nroStock,
       {
         venta: {
@@ -155,20 +163,14 @@ router.post('/venta', async (req, res, next) => {
             data.fechaVenta.replace(/-/g, '/').replace(/T.+/, '')
           ),
           precio: data.precio,
-          peso: peso._id,
+          peso: newPeso._id,
         },
-        $push: { pesos: peso._id },
+        $push: { pesos: newPeso._id },
       },
       { new: true }
     );
 
-    const updatedPeso = await Peso.findByIdAndUpdate(
-      peso._id,
-      { stock: stock._id },
-      { new: true }
-    );
-
-    res.status(200).json({ ok: true, stock, updatedPeso });
+    res.status(200).json({ ok: true, updatedStock, newPeso });
   } catch (err) {
     console.log('ERROR -> ', err.message);
     res.status(200).json({ ok: false, errorMsg: err.message });
@@ -178,27 +180,25 @@ router.post('/venta', async (req, res, next) => {
 router.post('/peso', async (req, res, next) => {
   try {
     data = req.body;
-    const response = await Peso.create({
+    const newPeso = await Peso.create({
       fecha: new Date(data.fecha.replace(/-/g, '/').replace(/T.+/, '')),
-      peso: data.peso,
       stock: data.nroStock,
+      peso: data.peso,
       tipo: 'control',
       unidad: 'kg',
     });
 
-    const updatedStock = await Stock.findByIdAndUpdate(
+    const addPesoToStock = await Stock.findByIdAndUpdate(
       data.nroStock,
       {
-        $push: { pesos: response._id },
+        $push: { pesos: newPeso._id },
       },
       { new: true }
     );
 
-    console.log({ updatedStock });
-
-    res.status(200).json({ ok: true, response });
+    res.status(200).json({ ok: true, newPeso });
   } catch (err) {
-    console.log('ERROR -> ', err.message);
+    console.log('ERROR -> ', err);
     res.status(200).json({ ok: false, errorMsg: err.message });
   }
 });
@@ -218,6 +218,28 @@ router.delete('/', async (req, res, next) => {
   } catch (err) {
     console.log('ERROR -> ', err);
     res.status(200).json({ ok: false, errorMsg: err.message });
+  }
+});
+
+router.post('/export', async (req, res, next) => {
+  console.log('EXPORTING FROM API');
+  try {
+    const data = req.body.data;
+
+    exportToExcel(data);
+
+    res.status(200).json({ ok: true });
+  } catch (err) {
+    console.log('ERROR -> ', err);
+    res.status(200).json({ ok: false, errorMsg: err.message });
+  }
+});
+
+router.get('/export', async (req, res, next) => {
+  try {
+    res.download('./data/finca_puricaure.xlsx');
+  } catch (err) {
+    console.log('ERROR -> ', err.message);
   }
 });
 

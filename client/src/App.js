@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
-import { Modal } from 'antd';
+import { Modal, Form } from 'antd';
 
 import './App.css';
 import Header from './components/Header';
@@ -25,6 +25,8 @@ function App() {
   const [stockId, setStockId] = useState('');
   const [lastSelected, setLastSelected] = useState(null);
 
+  // const [compraForm] = Form.useForm();
+
   const fetchStock = async () => {
     try {
       const response = await axios.get(process.env.REACT_APP_API + 'stock/');
@@ -48,6 +50,13 @@ function App() {
       const filter = filterData;
       let filteredStock = [...originalStock];
 
+      if (filter.loteNro) {
+        console.log('FILTRANDO POR LOTE');
+        filteredStock = [
+          ...filteredStock.filter((stock) => stock.loteNro === filter.loteNro),
+        ];
+      }
+
       if (filter.vendido) {
         if (filter.vendido === 'sinvender') {
           filteredStock = [
@@ -61,7 +70,7 @@ function App() {
               if (!stock.venta || Object.keys(stock.venta).length === 0)
                 return false;
 
-              return !!!stock.reposicion;
+              return !!!stock.venta.reposicion;
             }),
           ];
         } else if (filter.vendido === 'vendido') {
@@ -70,7 +79,7 @@ function App() {
               return (
                 stock.venta &&
                 Object.keys(stock.venta).length > 0 &&
-                stock.reposicion
+                stock.venta.reposicion
               );
             }),
           ];
@@ -228,7 +237,7 @@ function App() {
         onClick={handleShowDetails}
         openFilter={handleShowModal}
         onLastSelected={(stock) => {
-          setLastSelected(stock[0]?.venta?.fecha ? null : stock[0]);
+          setLastSelected(stock[stock?.length - 1]?.venta?.fecha ? null : stock[stock.length - 1]);
         }}
       />
     </div>
