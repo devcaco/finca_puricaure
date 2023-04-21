@@ -10,12 +10,14 @@ import {
   Switch,
   Tooltip,
 } from 'antd';
+
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import styles from './compra.module.css';
 
 dayjs.extend(customParseFormat);
 const dateFormatList = ['MM/DD/YYYY', 'MM/DD/YY', 'MM-DD-YYYY', 'MM-DD-YY'];
+const { TextArea } = Input;
 
 const Compra = ({ onClose }) => {
   const [isReposicion, setIsReposicion] = useState(true);
@@ -63,12 +65,8 @@ const Compra = ({ onClose }) => {
         throw new Error('Favor llenar campos requeridos');
       }
 
-      // if (isReposicion && !formInput.stockReposicion) {
-      //   throw new Error('Favor seleccionar la reposicion');
-      // }
-
       const response = await axios.post(
-        process.env.REACT_APP_API + 'stock/',
+        process.env.REACT_APP_API + 'stock/compra',
         formInput
       );
 
@@ -104,12 +102,12 @@ const Compra = ({ onClose }) => {
       </h2>
       {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
       <Form
+        form={form}
+        name="compraForm"
         layout="horizontal"
         labelCol={{ span: 9 }}
         labelAlign="left"
-        name="compraForm"
         wrapperCol={{ offset: 0 }}
-        form={form}
         onFinish={handleSubmit}
         onFinishFailed={handleFormError}
         requiredMark={false}
@@ -121,36 +119,67 @@ const Compra = ({ onClose }) => {
           unidadPeso: 'kg',
           precio: 0,
           stockReposicion: '',
+          tipoStock: '',
         }}
       >
-        {/* <label htmlFor="fecha">Fecha Compra</label> */}
         <Form.Item
-          // noStyle
+          label="Tipo Ganado"
+          name="tipoStock"
+          rules={[{ required: true, message: 'Favor seleccionar un tipo de ganado' }]}
+          help={''}
+        >
+          <Select
+            onChange={(value) => {
+              handleChange('tipoStock', value);
+            }}
+            options={[
+              {
+                value: '',
+                label: '-------',
+              },
+              ...[
+                'Vacas de Ordeño',
+                'Vacas Cria',
+                'Vacas Paridas',
+                'Vacas Escoteras',
+                'Crias Hembras',
+                'Crias Machos',
+                'Novillas de Viente',
+                'Hembras de Levante',
+                'Machos de Levante',
+                'Machos de Ceba',
+                'Toretes',
+                'Toros',
+                'Otro',
+              ].map((tipo) => ({
+                key: `${tipo}`,
+                value: `${tipo}`,
+                label: `${tipo}`,
+              })),
+            ]}
+          />
+        </Form.Item>
+        <Form.Item
           label="Fecha Compra"
           name="fecha"
-          rules={[{ required: true, message: 'Favor llenar fecha de compra' }]}
+          rules={[{ required: true, message: 'Favor seleccionar fecha de compra' }]}
           help={''}
-
-          // noStyle
         >
           <DatePicker
             format={dateFormatList}
             onChange={(date, dateString) => {
-              // console.log({ theDate: date });
               handleChange('fecha', dayjs(date, dateFormatList[0]));
             }}
             style={{ width: '100%' }}
           />
         </Form.Item>
-        {/* <label htmlFor="nroStock">Nro de Stock</label> */}
         <Form.Item
-          // noStyle
-          label="Nro de Stock"
+          label="Nro de Ganado"
           name="nroStock"
           rules={[
             {
               required: true,
-              message: 'Favor introducir el Nro de stock',
+              message: 'Favor introducir el Nro de ganado',
             },
           ]}
           help={''}
@@ -163,9 +192,7 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
 
-        {/* <label htmlFor="nroLote">Nro de Lote</label> */}
         <Form.Item
-          // noStyle
           label="Nro de Lote"
           name="nroLote"
           rules={[
@@ -187,9 +214,7 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
 
-        {/* <label htmlFor="pesoEntrada">Peso Entrada</label> */}
         <Form.Item
-          // noStyle
           label="Peso Entrada"
           name="pesoEntrada"
           rules={[
@@ -233,9 +258,7 @@ const Compra = ({ onClose }) => {
             }
           />
         </Form.Item>
-        {/* <label htmlFor="precio">Precio Por Peso</label> */}
         <Form.Item
-          // noStyle
           label="Precio Por Peso"
           name="precio"
           rules={[
@@ -258,19 +281,6 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
 
-        {/* <label htmlFor="reposicion">Reposicion?</label> */}
-        {/* <div>
-          <span></span> */}
-        {/* <Form.Item label="Reposicion?">
-            <Form.Item noStyle name="reposicion">
-              <Switch
-                checked={isReposicion ? true : false}
-                onChange={(checked) => {
-                  setIsReposicion(checked);
-                }}
-                style={{ marginRight: '2rem' }}
-              />
-            </Form.Item> */}
         <Form.Item name="stockReposicion" label="Reposicion?">
           <Select
             placeholder={'Nro de Stock'}
@@ -296,18 +306,10 @@ const Compra = ({ onClose }) => {
             ]}
           />
         </Form.Item>
-        {/* </Form.Item> */}
-        {/* <Form.Item
-          noStyle
-          name="stockReposicion"
-          rules={[
-            {
-              required: isReposicion ? true : false,
-              message: 'Favor seleccionar Stock de Reposicion',
-            },
-          ]}
-        ></Form.Item> */}
-        {/* </div> */}
+
+        <Form.Item label="Notas" name="notas">
+          <TextArea rows={4}></TextArea>
+        </Form.Item>
         <Form.Item>
           <Button
             type="primary"

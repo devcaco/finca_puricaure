@@ -18,6 +18,8 @@ export const FilterProvider = ({ children }) => {
 
   const isFilterActive = () => {
     if (
+      filterData.tipoStock ||
+      filterData.loteNro ||
       filterData.vendido ||
       filterData.fechaCompra1 ||
       filterData.fechaCompra2 ||

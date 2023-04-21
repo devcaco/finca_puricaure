@@ -5,8 +5,12 @@ import { SearchOutlined } from '@ant-design/icons';
 import {
   CheckSquareOutlined,
   ExclamationCircleFilled,
+  CloseSquareOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSkullCrossbones } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './TheTable.module.css';
 
@@ -24,6 +28,7 @@ const TheTable = ({
     useContext(FilterContext);
 
   const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRowKeys, setSelectedRowsKey] = useState([]);
 
   const showConfirm = () => {
     confirm({
@@ -123,10 +128,17 @@ const TheTable = ({
       render: (venta, rows) => {
         return (
           <>
-            {venta && (
+            {venta.fecha && venta.tipo === 'venta' && (
               <CheckSquareOutlined
                 className={styles.vendido}
                 style={{ color: rows.venta.reposicion ? 'green' : 'orange' }}
+              />
+            )}
+            {venta.fecha && venta.tipo === 'perdida' && (
+              <FontAwesomeIcon
+                icon={faSkullCrossbones}
+                className={styles.vendido}
+                style={{ color: 'red' }}
               />
             )}
           </>

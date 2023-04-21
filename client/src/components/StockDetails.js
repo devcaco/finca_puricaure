@@ -13,7 +13,7 @@ const dateFormatList = ['MM/DD/YYYY', 'MM/DD/YY', 'MM-DD-YYYY', 'MM-DD-YY'];
 const StockDetails = ({ stockId, onClose }) => {
   const [errorMsg, setErrorMsg] = useState('');
   const [stockDetails, setStockDetails] = useState({});
-  const [editMode, setEditMode] = useState(true);
+  const [editMode, setEditMode] = useState(false);
   const [stockReposicion, setStockReposicion] = useState([]);
   const [formData, setformData] = useState({});
 
@@ -79,7 +79,7 @@ const StockDetails = ({ stockId, onClose }) => {
   return (
     <div className={styles.details}>
       <div className={styles.details__header}>
-        <h2>STOCK {stockDetails.stockNro}</h2>
+        <h2>STOCK {stockDetails.serialNro}</h2>
         <div className={styles.errorMsg}>{errorMsg}</div>
       </div>
       {stockDetails && (
@@ -190,8 +190,8 @@ const StockDetails = ({ stockId, onClose }) => {
                         <Col span={12}>Reposicion:</Col>
                         <Col span={12}>
                           {!editMode ? (
-                            stockDetails.reposicion &&
-                            stockDetails.reposicion.stockNro
+                            stockDetails?.compra?.reposicion &&
+                            stockDetails?.compra?.reposicion.serialNro
                           ) : (
                             <Select
                               style={{ width: '100%' }}
@@ -347,6 +347,15 @@ const StockDetails = ({ stockId, onClose }) => {
                           <Col span={12}>
                             {'$ ' +
                               stockDetails?.venta?.precio_total.toFixed(2)}
+                          </Col>
+                        </Row>
+                        <Row
+                          align="middle"
+                          className={[styles['section__row']]}
+                        >
+                          <Col span={12}>Reposicion</Col>
+                          <Col span={12}>
+                            {stockDetails?.venta?.reposicion.serialNro}
                           </Col>
                         </Row>
                       </div>

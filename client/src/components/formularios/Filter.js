@@ -56,6 +56,9 @@ const Filter = ({ onClose }) => {
       case 'vendido':
         setFormData((prevState) => ({ ...prevState, vendido: val }));
         break;
+      case 'tipoStock':
+        setFormData((prevState) => ({ ...prevState, tipoStock: val }));
+        break;
       case 'fechaCompra':
         setFormData((prevState) => ({
           ...prevState,
@@ -98,6 +101,7 @@ const Filter = ({ onClose }) => {
           buscar: filterSearch,
           vendido: formData.vendido || '',
           loteNro: formData.loteNro || '',
+          tipoStock: formData.tipoStock || '',
           fechaCompra: [formData.fechaCompra1, formData.fechaCompra2],
           fechaVenta: [formData.fechaVenta1, formData.fechaVenta2],
           peso: [formData.peso1, formData.peso2],
@@ -136,6 +140,40 @@ const Filter = ({ onClose }) => {
           />
         </Form.Item>
 
+        <Form.Item label="Tipo" name="tipoStock">
+          <Select
+            onChange={(value) => {
+              handleChange('tipoStock', value);
+            }}
+            allowClear
+            options={[
+              {
+                value: '',
+                label: '-------',
+              },
+              ...[
+                'Vacas de Ordeño',
+                'Vacas Cria',
+                'Vacas Paridas',
+                'Vacas Escoteras',
+                'Crias Hembras',
+                'Crias Machos',
+                'Novillas de Viente',
+                'Hembras de Levante',
+                'Machos de Levante',
+                'Machos de Ceba',
+                'Toretes',
+                'Toros',
+                'Otro',
+              ].map((tipo) => ({
+                key: `${tipo}`,
+                value: `${tipo}`,
+                label: `${tipo}`,
+              })),
+            ]}
+          />
+        </Form.Item>
+
         <Form.Item name="vendido" label="Vendido">
           <Select
             onChange={(val) => handleChange('vendido', val)}
@@ -145,6 +183,7 @@ const Filter = ({ onClose }) => {
               { value: 'vendido', label: 'Vendido con reposicion' },
               { value: 'sinreponer', label: 'Vendido sin reposicion' },
               { value: 'sinvender', label: 'Sin Vender' },
+              { value: 'perdida', label: 'Perdido' },
             ]}
           />
         </Form.Item>

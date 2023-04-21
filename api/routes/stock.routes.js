@@ -5,7 +5,11 @@ const exportToExcel = require('../utils/exportToExcel');
 
 router.get('/', async (req, res, next) => {
   try {
-    const theList = await Stock.find();
+    const theList = await Stock.find()
+      .populate('compra.reposicion')
+      .populate('venta.reposicion')
+      .populate('compra.peso')
+      .populate('venta.peso');
     res.status(200).json({ ok: true, stocks: theList });
   } catch (err) {
     console.log('ERROR -> ', err);
@@ -17,11 +21,12 @@ router.get('/stockReposicion', async (req, res, next) => {
   try {
     const response = await Stock.find({
       $and: [
-        { venta: { $exists: true, $ne: {} } },
+        { 'venta.fecha': { $exists: true } },
+        { 'venta.tipo': { $eq: 'venta' } },
         {
           $or: [
-            { reposicion: { $exists: false } },
-            { reposicion: { $eq: null } },
+            { 'venta.reposicion': { $exists: false } },
+            { 'venta.reposicion': { $eq: null } },
           ],
         },
       ],
@@ -39,7 +44,7 @@ router.get('/loteNros', async (req, res, next) => {
   try {
     const response = await Stock.distinct('loteNro');
 
-    console.log({ response });
+    // console.log({ response });
     if (response) res.json({ ok: true, loteNros: response });
   } catch (err) {
     console.log('ERROR -> ', err);
@@ -50,7 +55,7 @@ router.get('/loteNros', async (req, res, next) => {
 router.get('/stockVenta', async (req, res, next) => {
   try {
     const response = await Stock.find({
-      $or: [{ venta: { $exists: false } }, { venta: { $eq: {} } }],
+      $or: [{ 'venta.fecha': { $exists: false } }, { 'venta.fecha': { $eq: '' } }],
     });
 
     res.status(200).json({ ok: true, stockVenta: response });
@@ -61,20 +66,20 @@ router.get('/stockVenta', async (req, res, next) => {
 });
 
 router.get('/details/:id', async (req, res, next) => {
-  console.log('HOWDYYYYY - ', req.params.id);
+  // console.log('HOWDYYYYY - ', req.params.id);
   try {
     const response = await Stock.findById(req.params.id)
       .populate({
         path: 'pesos',
         options: { sort: { fecha: 1, createdAt: 1 } },
-        select: ['peso', 'fecha'],
+        select: ['peso', 'fecha', 'tipo'],
       })
       .populate('compra.reposicion')
-      .populate('compra.peso')
-      .populate('venta.peso')
       .populate('venta.reposicion');
+    // .populate('compra.peso')
+    // .populate('venta.peso');
 
-    console.log({ response });
+    // console.log({ response });
     if (!response) throw new Error('Invalid Stock ID Provided');
 
     res.status(200).json({ ok: true, stockDetails: response });
@@ -84,7 +89,7 @@ router.get('/details/:id', async (req, res, next) => {
   }
 });
 
-router.post('/', async (req, res, next) => {
+router.post('/compra', async (req, res, next) => {
   try {
     const data = req.body;
     console.log({ data });
@@ -94,10 +99,17 @@ router.post('/', async (req, res, next) => {
 
     if (isSerial) throw new Error('Nro de Serial ya existe!');
 
-    if (!data.nroStock || !data.nroLote || !data.fecha || !+data.precio)
+    if (
+      !data.tipoStock ||
+      !data.nroStock ||
+      !data.nroLote ||
+      !data.fecha ||
+      !+data.precio
+    )
       throw new Error('Campos Invalidos');
 
     const newStock = await Stock.create({
+      stockTipo: data.tipoStock,
       serialNro: serialNro,
       stockNro: data?.nroStock?.toString(),
       loteNro: data?.nroLote?.toString(),
@@ -106,6 +118,7 @@ router.post('/', async (req, res, next) => {
         peso: null,
         precio: data.precio,
         reposicion: !!data.stockReposicion ? data.stockReposicion : null,
+        notas: data.notas,
       },
       venta: {},
       pesos: [],
@@ -159,11 +172,13 @@ router.post('/venta', async (req, res, next) => {
       data.nroStock,
       {
         venta: {
+          tipo: data.tipoVenta,
           fecha: new Date(
             data.fechaVenta.replace(/-/g, '/').replace(/T.+/, '')
           ),
           precio: data.precio,
           peso: newPeso._id,
+          notas: data.notas,
         },
         $push: { pesos: newPeso._id },
       },

@@ -15,7 +15,7 @@ const Buttons = ({ onShowModal, isValid }) => {
         disabled={!isValid}
         onClick={() => onShowModal('venta')}
       >
-        Registrar Venta
+        Registrar Venta / Perdida
       </Button>
       <Button
         size="large"

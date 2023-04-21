@@ -31,6 +31,7 @@ function App() {
     try {
       const response = await axios.get(process.env.REACT_APP_API + 'stock/');
       if (response.data.ok) {
+        console.log({ theStocks: response.data.stocks });
         setStocks(response.data.stocks);
         setOriginalStock(response.data.stocks);
       } else {
@@ -57,20 +58,33 @@ function App() {
         ];
       }
 
+      if (filter.tipoStock) {
+        filteredStock = [
+          ...filteredStock.filter(
+            (stock) => stock.stockTipo === filter.tipoStock
+          ),
+        ];
+      }
+
       if (filter.vendido) {
         if (filter.vendido === 'sinvender') {
           filteredStock = [
             ...filteredStock.filter((stock) =>
-              stock.venta && Object.keys(stock.venta).length > 0 ? false : true
+              stock.venta.fecha && Object.keys(stock.venta).length > 0
+                ? false
+                : true
             ),
           ];
         } else if (filter.vendido === 'sinreponer') {
           filteredStock = [
             ...filteredStock.filter((stock) => {
-              if (!stock.venta || Object.keys(stock.venta).length === 0)
+              if (stock.venta?.tipo === 'perdida') return false;
+              if (!stock.venta.fecha || Object.keys(stock.venta).length === 0)
                 return false;
 
-              return !!!stock.venta.reposicion;
+              return !!!(
+                stock.venta.reposicion && stock.venta.tipo !== 'perdida'
+              );
             }),
           ];
         } else if (filter.vendido === 'vendido') {
@@ -81,6 +95,12 @@ function App() {
                 Object.keys(stock.venta).length > 0 &&
                 stock.venta.reposicion
               );
+            }),
+          ];
+        } else if (filter.vendido === 'perdida') {
+          filteredStock = [
+            ...filteredStock.filter((stock) => {
+              return stock.venta?.fecha && stock.venta.tipo === 'perdida';
             }),
           ];
         }
@@ -237,7 +257,11 @@ function App() {
         onClick={handleShowDetails}
         openFilter={handleShowModal}
         onLastSelected={(stock) => {
-          setLastSelected(stock[stock?.length - 1]?.venta?.fecha ? null : stock[stock.length - 1]);
+          setLastSelected(
+            stock[stock?.length - 1]?.venta?.fecha
+              ? null
+              : stock[stock.length - 1]
+          );
         }}
       />
     </div>
