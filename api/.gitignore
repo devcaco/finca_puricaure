@@ -24,3 +24,5 @@ ehthumbs.db
 
 # VS Code
 .vscode/*
+
+package-lock.json
