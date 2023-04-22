@@ -89,7 +89,7 @@ const Filter = ({ onClose }) => {
   };
   return (
     <section className={styles.filter}>
-      <h2>Filtro</h2>
+      <h2>Filter</h2>
 
       <Form
         form={form}
@@ -107,10 +107,10 @@ const Filter = ({ onClose }) => {
           peso: [formData.peso1, formData.peso2],
         }}
       >
-        <Form.Item name="buscar" label="Buscar" className={styles.hidden}>
+        <Form.Item name="buscar" label="Search" className={styles.hidden}>
           <Input
             value={filterSearch}
-            placeholder="Buscar por Nro"
+            placeholder="Cattle Number"
             allowClear={true}
             // addonBefore={<SearchOutlined />}
             onChange={(e) => {
@@ -120,7 +120,7 @@ const Filter = ({ onClose }) => {
           />
         </Form.Item>
 
-        <Form.Item name="loteNro" label="Lote">
+        <Form.Item name="loteNro" label="Batch">
           <Select
             onChange={(val) => handleChange('loteNro', val)}
             value={formData.loteNro}
@@ -140,7 +140,7 @@ const Filter = ({ onClose }) => {
           />
         </Form.Item>
 
-        <Form.Item label="Tipo" name="tipoStock">
+        <Form.Item label="Cattle Type" name="tipoStock">
           <Select
             onChange={(value) => {
               handleChange('tipoStock', value);
@@ -174,30 +174,29 @@ const Filter = ({ onClose }) => {
           />
         </Form.Item>
 
-        <Form.Item name="vendido" label="Vendido">
+        <Form.Item name="vendido" label="Sold">
           <Select
             onChange={(val) => handleChange('vendido', val)}
             // value={formData.vendido}
             options={[
               { value: '', label: '---------' },
-              { value: 'vendido', label: 'Vendido con reposicion' },
-              { value: 'sinreponer', label: 'Vendido sin reposicion' },
-              { value: 'sinvender', label: 'Sin Vender' },
-              { value: 'perdida', label: 'Perdido' },
+              { value: 'vendido', label: 'Sold with replenishment' },
+              { value: 'sinreponer', label: 'Sold with no replenishment' },
+              { value: 'sinvender', label: 'Not Sold' },
+              { value: 'perdida', label: 'Lost / Death' },
             ]}
           />
         </Form.Item>
 
-        <Form.Item name="fechaCompra" label="Fecha Compra">
+        <Form.Item name="fechaCompra" label="Date Purchased">
           <RangePicker
             format={dateFormatList}
             allowEmpty={[false, true]}
             onChange={(val) => handleChange('fechaCompra', val)}
-            // value={[formData.fechaCompra1, formData.fechaCompra2]}
           />
         </Form.Item>
 
-        <Form.Item name="fechaVenta" label="Fecha Venta">
+        <Form.Item name="fechaVenta" label="Date Sold">
           <RangePicker
             allowEmpty={[false, true]}
             onChange={(val) => handleChange('fechaVenta', val)}
@@ -205,7 +204,7 @@ const Filter = ({ onClose }) => {
           />
         </Form.Item>
 
-        <Form.Item name="peso" label="Peso">
+        <Form.Item name="peso" label="Weight">
           <Slider
             range
             min={0}
@@ -222,7 +221,7 @@ const Filter = ({ onClose }) => {
             disabled={!isFilterActive() ? 'disabled' : ''}
             style={{ width: '100%' }}
           >
-            Filtrar
+            Filter
           </Button>
         </Form.Item>
         <Form.Item noStyle>
@@ -233,7 +232,7 @@ const Filter = ({ onClose }) => {
             }}
             style={{ marginTop: '1rem', width: '100%' }}
           >
-            Resetear Filtro
+            Reset Filter
           </Button>
         </Form.Item>
       </Form>

@@ -40,7 +40,7 @@ const Venta = ({ onClose, selectedStock }) => {
 
   const handleFormError = (formError) => {
     console.log({ formError });
-    setErrorMsg('Formulario Invalido');
+    setErrorMsg('Error in Form');
   };
 
   const handleChange = (name, value) => {
@@ -60,7 +60,7 @@ const Venta = ({ onClose, selectedStock }) => {
         (formInput.tipoVenta === 'venta' && !formInput.precio) ||
         (formInput.tipoVenta === 'venta' && !formInput.pesoSalida)
       ) {
-        throw new Error('Campos Invalido.');
+        throw new Error('Invalid Form Inputs');
       }
 
       const response = await axios.post(
@@ -81,7 +81,7 @@ const Venta = ({ onClose, selectedStock }) => {
 
   return (
     <div className={styles.form}>
-      <h2>Formulario de Venta</h2>
+      <h2>Sale Form</h2>
       {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
       <Form
         form={form}
@@ -103,11 +103,9 @@ const Venta = ({ onClose, selectedStock }) => {
         }}
       >
         <Form.Item
-          label="Tipo"
+          label="Type"
           name="tipoVenta"
-          rules={[
-            { required: true, message: 'Favor seleccionar tipo de venta' },
-          ]}
+          rules={[{ required: true, message: 'Please select a sale type' }]}
           help={''}
         >
           <Select
@@ -116,11 +114,11 @@ const Venta = ({ onClose, selectedStock }) => {
             }}
             options={[
               {
-                value: 'venta',
+                value: 'sale',
                 label: 'Venta',
               },
               {
-                value: 'perdida',
+                value: 'death / lost',
                 label: 'Perdida',
               },
             ]}
@@ -128,16 +126,14 @@ const Venta = ({ onClose, selectedStock }) => {
         </Form.Item>
 
         <Form.Item
-          label="Nro de Stock"
+          label="Cattle Number"
           name={'nroStock'}
-          rules={[
-            { required: true, message: 'Favor seleccionar nro de Stock' },
-          ]}
+          rules={[{ required: true, message: 'Please select a cattle number' }]}
           help={''}
         >
           <Select
             style={{ minWidth: '200px' }}
-            placeholder={'Nro de Stock'}
+            placeholder={'Cattle Number'}
             showSearch
             optionFilterProp="children"
             onChange={(value) => {
@@ -162,9 +158,9 @@ const Venta = ({ onClose, selectedStock }) => {
         </Form.Item>
 
         <Form.Item
-          label="Fecha Venta"
+          label="Date Sold"
           name="fechaVenta"
-          rules={[{ required: true, message: 'Favor llenar fecha de venta' }]}
+          rules={[{ required: true, message: 'Please select the Sold Date' }]}
           help={''}
         >
           <DatePicker
@@ -176,9 +172,9 @@ const Venta = ({ onClose, selectedStock }) => {
         </Form.Item>
 
         <Form.Item
-          label="Peso Salida"
+          label="Weight"
           name="pesoSalida"
-          rules={[{ required: true, message: 'Favor introducir el peso' }]}
+          rules={[{ required: true, message: 'Please enter the sold weight' }]}
           help={''}
         >
           <InputNumber
@@ -217,9 +213,11 @@ const Venta = ({ onClose, selectedStock }) => {
         </Form.Item>
 
         <Form.Item
-          label="Precio Por Peso"
+          label="Price per Weight"
           name="precio"
-          rules={[{ required: true, message: 'Favor llenar precio por peso' }]}
+          rules={[
+            { required: true, message: 'Please enter the price per weight' },
+          ]}
           help={''}
         >
           <InputNumber
@@ -233,7 +231,7 @@ const Venta = ({ onClose, selectedStock }) => {
           />
         </Form.Item>
 
-        <Form.Item label="Notas" name="notas">
+        <Form.Item label="Notes" name="notas">
           <TextArea rows={4}></TextArea>
         </Form.Item>
         <Form.Item>
@@ -242,25 +240,14 @@ const Venta = ({ onClose, selectedStock }) => {
             htmlType="submit"
             style={{ marginTop: '20px', width: '100%' }}
           >
-            Guardar
+            Save
           </Button>
         </Form.Item>
         <Form.Item>
           <Button onClick={onClose} style={{ width: '100%' }}>
-            Cerrar
+            Close
           </Button>
         </Form.Item>
-
-        {/* <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            style={{ marginTop: '20px' }}
-          >
-            Guardar
-          </Button>
-        </Form.Item>
-        <Button onClick={onClose}>Cerrar</Button> */}
       </Form>
     </div>
   );

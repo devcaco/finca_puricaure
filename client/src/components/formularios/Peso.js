@@ -31,20 +31,20 @@ const Peso = ({ onClose, selectedStock }) => {
 
   useEffect(() => {
     fetchStock();
-    console.log({selectedStock})
+    console.log({ selectedStock });
   }, [selectedStock]);
 
   const handleFormError = (formError) => {
     console.log({ formError });
 
-    setErrorMsg('Favor llenar todos los campos del formulario');
+    setErrorMsg('Please input all required fields');
   };
 
   const handleSubmit = async (formInput) => {
     try {
       console.log(formInput);
       if (!formInput.fecha || !formInput.nroStock || !formInput.peso) {
-        throw new Error('Formulario Invalido: Favor llenar campos requeridos');
+        throw new Error('Invalid Form: Please input all required fields');
       }
 
       const response = await axios.post(
@@ -69,24 +69,29 @@ const Peso = ({ onClose, selectedStock }) => {
 
   return (
     <div className={styles.form}>
-      <h2>Registrar Peso</h2>
+      <h2>Register Weight Form</h2>
       {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
       <Form
+        form={form}
         name="pesoForm"
+        layout="horizontal"
+        labelCol={{ span: 9 }}
+        labelAlign="left"
+        wrapperCol={{ offset: 0 }}
+        requiredMark={false}
         onFinish={handleSubmit}
         onFinishFailed={handleFormError}
-        form={form}
         initialValues={{
           fecha: dayjs(),
-          peso: selectedStock.pesos[0]?.peso ?? 0,
+          peso: 0,
           nroStock: selectedStock?._id ?? '',
         }}
       >
-        <label htmlFor="fecha">Fecha</label>
+        {/* <label htmlFor="fecha">Fecha</label> */}
         <Form.Item
+          label="Date"
           name={'fecha'}
-          rules={[{ required: true, message: 'Favor llenar fecha' }]}
-          noStyle
+          rules={[{ required: true, message: 'Please select the date' }]}
         >
           <DatePicker
             format={dateFormatList}
@@ -96,18 +101,17 @@ const Peso = ({ onClose, selectedStock }) => {
           />
         </Form.Item>
 
-        <label htmlFor="nroStock">Nro de Stock</label>
-
+        {/* <label htmlFor="nroStock">Cattle Number</label> */}
         <Form.Item
+          label="Cattle Number"
           name={'nroStock'}
           rules={[
-            { required: true, message: 'Favor seleccionar nro de Stock' },
+            { required: true, message: 'Please select the Cattle Number' },
           ]}
-          noStyle
         >
           <Select
             style={{ minWidth: '200px' }}
-            placeholder={'Nro de Stock'}
+            placeholder={'Cattle Number'}
             showSearch
             optionFilterProp="children"
             onChange={(value) => {
@@ -131,16 +135,16 @@ const Peso = ({ onClose, selectedStock }) => {
           />
         </Form.Item>
 
-        <label htmlFor="peso">Peso</label>
+        {/* <label htmlFor="peso">Weight</label> */}
         <Form.Item
-          noStyle
+          label="Weight"
           name="peso"
           rules={[
-            { required: true, message: 'Favor introducir el peso' },
+            { required: true, message: 'Please input the Weight' },
             {
               type: 'number',
               min: 0.5,
-              message: 'Favor introducir un valor valido para el peso.',
+              message: 'Please enter a valid weight',
             },
           ]}
         >
@@ -180,10 +184,10 @@ const Peso = ({ onClose, selectedStock }) => {
             htmlType="submit"
             style={{ marginTop: '20px' }}
           >
-            Guardar
+            Save
           </Button>
         </Form.Item>
-        <Button onClick={onClose}>Cerrar</Button>
+        <Button onClick={onClose}>Close</Button>
       </Form>
     </div>
   );

@@ -50,7 +50,7 @@ const Compra = ({ onClose }) => {
   const handleFormError = (error) => {
     console.log('FORM ERROR', error);
 
-    setErrorMsg('Favor llenar todos los campos requeridos');
+    setErrorMsg('Please enter required fields');
   };
 
   const handleSubmit = async (formInput) => {
@@ -62,7 +62,7 @@ const Compra = ({ onClose }) => {
         !formInput.pesoEntrada ||
         !formInput.precio
       ) {
-        throw new Error('Favor llenar campos requeridos');
+        throw new Error('Please enter required fields');
       }
 
       const response = await axios.post(
@@ -97,7 +97,7 @@ const Compra = ({ onClose }) => {
   return (
     <div className={styles.form}>
       <h2>
-        Formulario de Entrada <br />
+        Entry Form <br />
         {nroSerial}
       </h2>
       {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
@@ -108,9 +108,9 @@ const Compra = ({ onClose }) => {
         labelCol={{ span: 9 }}
         labelAlign="left"
         wrapperCol={{ offset: 0 }}
+        requiredMark={false}
         onFinish={handleSubmit}
         onFinishFailed={handleFormError}
-        requiredMark={false}
         initialValues={{
           fecha: dayjs(),
           nroStock: 0,
@@ -123,9 +123,9 @@ const Compra = ({ onClose }) => {
         }}
       >
         <Form.Item
-          label="Tipo Ganado"
+          label="Cattle Type"
           name="tipoStock"
-          rules={[{ required: true, message: 'Favor seleccionar un tipo de ganado' }]}
+          rules={[{ required: true, message: 'Please Select a Cattle Type' }]}
           help={''}
         >
           <Select
@@ -160,9 +160,11 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
         <Form.Item
-          label="Fecha Compra"
+          label="Date Purchased"
           name="fecha"
-          rules={[{ required: true, message: 'Favor seleccionar fecha de compra' }]}
+          rules={[
+            { required: true, message: 'Please specify the purchase date' },
+          ]}
           help={''}
         >
           <DatePicker
@@ -174,12 +176,12 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
         <Form.Item
-          label="Nro de Ganado"
+          label="Cattle Number"
           name="nroStock"
           rules={[
             {
               required: true,
-              message: 'Favor introducir el Nro de ganado',
+              message: 'Please enter Cattle Number',
             },
           ]}
           help={''}
@@ -193,7 +195,7 @@ const Compra = ({ onClose }) => {
         </Form.Item>
 
         <Form.Item
-          label="Nro de Lote"
+          label="Batch Number"
           name="nroLote"
           rules={[
             { required: true, message: '' },
@@ -215,7 +217,7 @@ const Compra = ({ onClose }) => {
         </Form.Item>
 
         <Form.Item
-          label="Peso Entrada"
+          label="Weight"
           name="pesoEntrada"
           rules={[
             { required: true, message: '' },
@@ -259,10 +261,10 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
         <Form.Item
-          label="Precio Por Peso"
+          label="Price per Weight"
           name="precio"
           rules={[
-            { required: true, message: 'Favor llenar precio por peso' },
+            { required: true, message: 'Please enter the price per weight' },
             {
               type: 'number',
               min: 0.1,
@@ -281,9 +283,9 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
 
-        <Form.Item name="stockReposicion" label="Reposicion?">
+        <Form.Item name="stockReposicion" label="Replenishment?">
           <Select
-            placeholder={'Nro de Stock'}
+            placeholder={'Cattle Number'}
             showSearch
             optionFilterProp="children"
             onChange={(value) => {
@@ -301,13 +303,13 @@ const Compra = ({ onClose }) => {
               ...stockReposicion.map((stock) => ({
                 key: `${stock._id}`,
                 value: `${stock._id}`,
-                label: `${stock.stockNro}`,
+                label: `${stock.serialNro}`,
               })),
             ]}
           />
         </Form.Item>
 
-        <Form.Item label="Notas" name="notas">
+        <Form.Item label="Notes" name="notas">
           <TextArea rows={4}></TextArea>
         </Form.Item>
         <Form.Item>
@@ -316,12 +318,12 @@ const Compra = ({ onClose }) => {
             htmlType="submit"
             style={{ marginTop: '20px', width: '100%' }}
           >
-            Guardar
+            Save
           </Button>
         </Form.Item>
         <Form.Item>
           <Button onClick={onClose} style={{ width: '100%' }}>
-            Cerrar
+            Close
           </Button>
         </Form.Item>
       </Form>

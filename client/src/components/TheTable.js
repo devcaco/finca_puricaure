@@ -37,10 +37,10 @@ const TheTable = ({
 
   const showConfirm = () => {
     confirm({
-      title: 'Esta usted seguro?',
+      title: 'Are you sure?',
       icon: <ExclamationCircleFilled />,
-      content: 'Se borraran todos los registros seleccinados',
-      okText: 'Si',
+      content: 'All selected items will be deleted',
+      okText: 'Yes',
       okType: 'danger',
       cancelText: 'No',
       onOk() {
@@ -74,7 +74,7 @@ const TheTable = ({
       ),
     },
     {
-      title: 'Lote',
+      title: 'Batch',
       dataIndex: 'loteNro',
       key: 'loteNro',
       sorter: (a, b) => {
@@ -84,27 +84,27 @@ const TheTable = ({
       },
     },
     {
-      title: 'Fecha Compra',
+      title: 'Date Purchased',
       dataIndex: 'compra',
       key: 'fechaCompra',
       render: (compra) => <>{new Date(compra.fecha).toLocaleDateString()}</>,
     },
     {
-      title: 'Precio Por Kg',
+      title: 'Price Per Weight',
       dataIndex: 'compra',
       key: 'precioCompra',
       render: (compra) => <>{'$ ' + compra.precio.toFixed(2)}</>,
       responsive: ['md'],
     },
     {
-      title: 'Peso Compra',
+      title: 'Purchased Weight',
       dataIndex: 'compra',
       key: 'pesoCompra',
       render: (compra) => <>{compra.peso ? compra.peso.peso + ' kgs' : ''}</>,
       responsive: ['md'],
     },
     {
-      title: 'Precio Total',
+      title: 'Total Price',
       dataIndex: 'compra',
       key: 'precioTotal',
       render: (compra) => (
@@ -118,7 +118,7 @@ const TheTable = ({
       responsive: ['md'],
     },
     {
-      title: 'Ultimo Peso',
+      title: 'Last Weight',
       dataIndex: 'pesos',
       key: 'pesos',
       render: (pesos, rows) => (
@@ -126,7 +126,7 @@ const TheTable = ({
       ),
     },
     {
-      title: 'Vendido',
+      title: 'Sold',
       dataIndex: 'venta',
       key: 'venta',
       responsive: ['md'],
@@ -200,12 +200,12 @@ const TheTable = ({
               disabled={!selectedRows.length ? 'disabled' : ''}
               onClick={showConfirm}
             >
-              Borrar
+              Delete
             </Button>
             <Input
               name="search"
               value={filterSearch}
-              placeholder="Buscar por Nro"
+              placeholder="Search by Cattle Number"
               allowClear={true}
               addonBefore={<SearchOutlined />}
               onChange={(e) => {
@@ -221,7 +221,7 @@ const TheTable = ({
                   clearFilterData();
                 }}
               >
-                Borrar Filtro
+                Clear Filter
               </Button>
             </div>
           )}
@@ -231,9 +231,9 @@ const TheTable = ({
               onClick={() => openFilter('filter')}
               style={{ marginRight: '20px' }}
             >
-              Filtrar
+              Filter
             </Button>
-            <Button onClick={() => exportData()}>Exportar</Button>
+            <Button onClick={() => exportData()}>Export Data</Button>
           </div>
         </div>
         <Table

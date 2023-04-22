@@ -5,7 +5,7 @@ import styles from './header.module.css';
 const Header = () => {
   return (
     <div>
-      <h1>Finca Puricaure</h1>
+      <h1>Puricaure Ranch</h1>
     </div>
   );
 };
