@@ -5,7 +5,6 @@ import { SearchOutlined } from '@ant-design/icons';
 import {
   CheckSquareOutlined,
   ExclamationCircleFilled,
-  CloseSquareOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
 
@@ -23,12 +22,18 @@ const TheTable = ({
   openFilter,
   onClick,
   onLastSelected,
+  loading,
+  clearSelected,
 }) => {
   const { filterSearch, setFilterSearch, isFilterActive, clearFilterData } =
     useContext(FilterContext);
 
   const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedRowKeys, setSelectedRowsKey] = useState([]);
+
+  useEffect(() => {
+    setSelectedRows([]);
+    onLastSelected([]);
+  }, [clearSelected, stocks, onLastSelected]);
 
   const showConfirm = () => {
     confirm({
@@ -168,14 +173,18 @@ const TheTable = ({
   };
 
   const rowSelection = {
+    selectedRowKeys: selectedRows,
     onChange: (selectedRowKeys, selectedRows) => {
       setSelectedRows(selectedRowKeys);
     },
     onSelect: (record, selected, selectedRows) => {
+      setSelectedRows(selectedRows);
       onLastSelected(selectedRows);
     },
     onSelectAll: (selected, selectedRows, changeRows) => {
       // console.log(selected, selectedRows, changeRows);
+      setSelectedRows(selectedRows);
+      onLastSelected(selectedRows);
     },
   };
 
@@ -231,6 +240,7 @@ const TheTable = ({
           columns={columns}
           rowKey={(record) => record._id}
           dataSource={stocks}
+          loading={loading}
           pagination={{
             defaultPageSize: 20,
             total: stocks.length,

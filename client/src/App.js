@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import axios from 'axios';
 import { Modal, Form } from 'antd';
 
@@ -24,20 +24,27 @@ function App() {
   const [stocks, setStocks] = useState([]);
   const [stockId, setStockId] = useState('');
   const [lastSelected, setLastSelected] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [clearTableSelection, setClearTableSelection] = useState(false);
 
   // const [compraForm] = Form.useForm();
 
   const fetchStock = async () => {
     try {
+      setLoading(true);
+
       const response = await axios.get(process.env.REACT_APP_API + 'stock/');
       if (response.data.ok) {
         console.log({ theStocks: response.data.stocks });
         setStocks(response.data.stocks);
         setOriginalStock(response.data.stocks);
+        setLoading(false);
       } else {
+        setLoading(false);
         throw new Error(response.data.errorMsg);
       }
     } catch (err) {
+      setLoading(false);
       console.log('ERROR -> ', err);
     }
   };
@@ -186,6 +193,7 @@ function App() {
         }
       );
       if (response.data.ok) fetchStock();
+      setClearTableSelection(!clearTableSelection);
     } catch (err) {
       console.log('ERROR -> ', err);
     }
@@ -213,14 +221,15 @@ function App() {
       default:
         setActiveForm('');
     }
-
     setShowModal(true);
+    setClearTableSelection(!clearTableSelection);
   };
 
   const handleShowDetails = (id) => {
     setStockId(id);
     setActiveForm('details');
     setShowModal(true);
+    setClearTableSelection(!clearTableSelection);
   };
 
   return (
@@ -256,13 +265,16 @@ function App() {
         onDelete={deleteStock}
         onClick={handleShowDetails}
         openFilter={handleShowModal}
-        onLastSelected={(stock) => {
+        loading={loading}
+        clearSelected={clearTableSelection}
+        onLastSelected={useCallback((stock) => {
+          console.log('hola', stock);
           setLastSelected(
             stock[stock?.length - 1]?.venta?.fecha
               ? null
               : stock[stock.length - 1]
           );
-        }}
+        }, [])}
       />
     </div>
   );
