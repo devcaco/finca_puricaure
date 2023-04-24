@@ -28,6 +28,7 @@ function Main() {
   const [lastSelected, setLastSelected] = useState(null);
   const [loading, setLoading] = useState(false);
   const [clearTableSelection, setClearTableSelection] = useState(false);
+  const [modalWidth, setModalWidth] = useState(500);
 
   // const [compraForm] = Form.useForm();
 
@@ -209,21 +210,27 @@ function Main() {
   const handleShowModal = (form) => {
     switch (form) {
       case 'compra':
+        setModalWidth(500);
         setActiveForm('compra');
         break;
       case 'venta':
+        setModalWidth(450);
         setActiveForm('venta');
         break;
       case 'peso':
+        setModalWidth(400);
         setActiveForm('peso');
         break;
       case 'filter':
+        setModalWidth(400);
         setActiveForm('filter');
         break;
       case 'upload':
+        setModalWidth(500);
         setActiveForm('upload');
         break;
       default:
+        setModalWidth(500);
         setActiveForm('');
     }
     setShowModal(true);
@@ -232,6 +239,7 @@ function Main() {
 
   const handleShowDetails = (id) => {
     setStockId(id);
+    setModalWidth(750);
     setActiveForm('details');
     setShowModal(true);
     // setClearTableSelection(!clearTableSelection);
@@ -245,7 +253,7 @@ function Main() {
         centered
         onCancel={() => setShowModal(false)}
         footer={[]}
-        width={activeForm === 'details' ? 750 : '40em'}
+        width={modalWidth}
         destroyOnClose={true}
       >
         {activeForm === 'compra' && <Compra onClose={handleOnClose} />}
@@ -262,7 +270,9 @@ function Main() {
         {activeForm === 'details' && (
           <StockDetails onClose={handleOnClose} stockId={stockId} />
         )}
-        {activeForm === 'filter' && <Filter onClose={handleOnClose} />}
+        {activeForm === 'filter' && (
+          <Filter onClose={handleOnClose} stockCount={stocks.length} />
+        )}
         {activeForm === 'upload' && <UploadFile onClose={handleOnClose} />}
       </Modal>
       <Buttons onShowModal={handleShowModal} isValid={!!lastSelected} />

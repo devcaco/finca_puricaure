@@ -66,7 +66,7 @@ const UploadFile = ({ onClose }) => {
       <div className={styles.errorMsg}>{errorMsg !== null && errorMsg}</div>
       <div>
         <Upload {...props} className={styles.upload}>
-          <Button icon={<UploadOutlined />}>Seleccione el archivo</Button>
+          <Button icon={<UploadOutlined />}>Seleccionar archivo</Button>
         </Upload>
       </div>
       <div className={styles.buttons}>

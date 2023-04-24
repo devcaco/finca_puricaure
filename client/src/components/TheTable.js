@@ -158,13 +158,13 @@ const TheTable = ({
       render: (venta, rows) => {
         return (
           <>
-            {venta.fecha && venta.tipo === 'venta' && (
+            {venta?.fecha && venta.tipo === 'venta' && (
               <CheckSquareOutlined
                 className={styles.vendido}
                 style={{ color: rows.venta.reposicion ? 'green' : 'orange' }}
               />
             )}
-            {venta.fecha && venta.tipo === 'perdida' && (
+            {venta?.fecha && venta.tipo === 'perdida' && (
               <FontAwesomeIcon
                 icon={faSkullCrossbones}
                 className={styles.vendido}

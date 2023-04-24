@@ -94,7 +94,7 @@ const Compra = ({ onClose }) => {
   return (
     <div className={styles.form}>
       <h2>
-        Formulario de Compra <br />
+        Registrar Compra <br />
         {nroSerial}
       </h2>
       {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
