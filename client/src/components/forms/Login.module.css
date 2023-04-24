@@ -1,0 +1,9 @@
+
+.login__form {
+    width: 100%;
+}
+
+.login__buttons Button {
+    width: 100%;
+    margin-top: 20px;
+}

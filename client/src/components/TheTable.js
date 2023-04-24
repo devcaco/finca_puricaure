@@ -1,11 +1,15 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
-import { Table, Modal, Button, Input } from 'antd';
+import { Table, Modal, Button, Input, Dropdown, Space } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import {
   CheckSquareOutlined,
   ExclamationCircleFilled,
   DeleteOutlined,
+  DownOutlined,
+  FileExcelOutlined,
+  FilterOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,8 +18,10 @@ import { faSkullCrossbones } from '@fortawesome/free-solid-svg-icons';
 import styles from './TheTable.module.css';
 
 import FilterContext from '../context/Filter.context';
+import UploadFile from './forms/UploadFile';
 
 const { confirm } = Modal;
+
 const TheTable = ({
   stocks,
   onDelete,
@@ -24,6 +30,7 @@ const TheTable = ({
   onLastSelected,
   loading,
   clearSelected,
+  openUpload,
 }) => {
   const { filterSearch, setFilterSearch, isFilterActive, clearFilterData } =
     useContext(FilterContext);
@@ -46,6 +53,26 @@ const TheTable = ({
       onOk() {
         console.log('OK');
         onDelete(selectedRows);
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  };
+
+  const showConfirmExport = () => {
+    confirm({
+      title: 'Export Data to XLSX ?',
+      icon: '',
+      content: 'This will export the current table view to an XLSX file',
+      okText: 'Export',
+      okType: 'primary',
+      width: '430px',
+      cancelText: 'No',
+      onOk() {
+        console.log('OK');
+        // onDelete(selectedRows);
+        exportData();
       },
       onCancel() {
         console.log('Cancel');
@@ -153,8 +180,6 @@ const TheTable = ({
   ];
 
   const handleDetails = (id) => {
-    console.log({ theIDFromTheTable: id });
-
     onClick(id);
   };
 
@@ -182,10 +207,38 @@ const TheTable = ({
       onLastSelected(selectedRows);
     },
     onSelectAll: (selected, selectedRows, changeRows) => {
-      // console.log(selected, selectedRows, changeRows);
       setSelectedRows(selectedRows);
       onLastSelected(selectedRows);
     },
+  };
+
+  const handleMenuClick = (e) => {
+    console.log(e);
+
+    if (e.key === '1') {
+      openUpload('upload');
+    }
+
+    if (e.key === '2') {
+      showConfirmExport();
+    }
+  };
+
+  const items = [
+    {
+      label: 'Import Data',
+      key: '1',
+      icon: <FileExcelOutlined />,
+    },
+    {
+      label: 'Export to Excel',
+      key: '2',
+      icon: <FileExcelOutlined />,
+    },
+  ];
+  const optionsProps = {
+    items,
+    onClick: handleMenuClick,
   };
 
   return (
@@ -228,12 +281,20 @@ const TheTable = ({
 
           <div>
             <Button
+              icon={<FilterOutlined />}
               onClick={() => openFilter('filter')}
               style={{ marginRight: '20px' }}
             >
               Filter
             </Button>
-            <Button onClick={() => exportData()}>Export Data</Button>
+            <Dropdown menu={optionsProps}>
+              <Button>
+                <Space>
+                  Options
+                  <DownOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
           </div>
         </div>
         <Table

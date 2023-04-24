@@ -9,7 +9,7 @@ const pesoSchema = new Schema(
     stock: {
       type: Schema.Types.ObjectId,
       ref: 'Stock',
-      required: true,
+      required: false,
     },
     tipo: {
       type: String,

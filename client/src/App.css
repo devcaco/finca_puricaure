@@ -1,18 +1,13 @@
 .App {
-  margin: 0 auto;
-  max-width: 900px;
-  background-color: #fff;
-  min-height: 100vh;
 }
 
 .ant-form-item {
   margin-bottom: 10px !important;
 }
 
-
 @media (max-width: 575px) {
   .ant-form-item-label > label {
-  height: 0 !important;
-  /* background-color: red; */
-}
+    height: 0 !important;
+    /* background-color: red; */
+  }
 }

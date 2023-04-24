@@ -1,0 +1,34 @@
+.fileUpload h1 {
+  text-align: center;
+}
+
+.upload {
+  height: 200px;
+  width: 80%;
+  border: 1px solid #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.buttons {
+  width: 80%;
+  margin: 0 auto;
+}
+
+.errorMsg {
+    color: red;
+    font-size: .9rem;
+    font-weight: bold;
+    /* height: 30px; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.buttons > Button {
+  width: 100%;
+  border-radius: unset;
+}

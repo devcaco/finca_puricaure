@@ -22,21 +22,21 @@ const stockSchema = new Schema(
     stockTipo: {
       type: String,
       enum: [
-        'Vacas de Ordeño',
-        'Vacas Cria',
-        'Vacas Paridas',
-        'Vacas Escoteras',
-        'Crias Hembras',
-        'Crias Machos',
-        'Novillas de Viente',
-        'Hembras de Levante',
-        'Machos de Levante',
-        'Machos de Ceba',
-        'Toretes',
-        'Toros',
-        'Otro',
+        'Holstein Friesian',
+        'Hereford',
+        'Simmental',
+        'Aberdeen Angus',
+        'Belgian Blue',
+        'Limousin',
+        'Brangus',
+        'Red Angus',
+        'Braford',
+        'Belted Galloway',
+        'Brown Swiss',
+        'Beefalo',
+        'Other',
       ],
-      required: true,
+      required: false,
     },
     pesos: [
       {
@@ -58,7 +58,6 @@ const stockSchema = new Schema(
       tipo: {
         type: String,
         enum: ['venta', 'perdida'],
-        default: 'venta',
       },
       fecha: Date,
       precio: Number,
@@ -73,16 +72,30 @@ const stockSchema = new Schema(
     toObject: { virtuals: true },
   }
 );
+stockSchema.virtual('repo', {
+  ref: 'Stock',
+  localField: 'venta.reposicion',
+  foreignField: '_id',
+});
 
-stockSchema.pre(/^find/, async function () {
+stockSchema.pre(/^find/, async function (next) {
   this.populate({
     path: 'pesos',
-    options: { sort: { createdAt: -1 } },
-    select: 'peso',
+    options: { sort: { fecha: -1, createdAt: -1 } },
+    select: 'fecha peso tipo unidad',
   });
 
   this.populate('compra.peso');
   this.populate('venta.peso');
+  this.populate('venta.reposicion');
+
+  if (this.venta?.reposicion) {
+    console.log('CALCULANDO GANACIA');
+    let precioVenta = this.totalPrecioVenta;
+    let precioCompra = this.totalPrecioCompra;
+    this.ganancia2 = precioVenta - precioCompra;
+  }
+  next();
 });
 
 const Stock = model('Stock', stockSchema);
@@ -101,22 +114,24 @@ stockSchema.virtual('totalPrecioCompra').get(function () {
   }
 });
 
-stockSchema.virtual('ganancia').get(function () {
+stockSchema.virtual('ganancia2').get(async function () {
   // this.populate('venta.reposicion');
   // this.populate('compra.reposicion');
-  if (this.venta?.fecha && this.venta?.reposicion) {
-    let stockReposicion = this.populate('compra.reposicion');
-    console.log({ stockReposicion });
-    let totalPrecioVenta = this.venta?.peso?.peso * this.venta?.precio;
-    let totalPrecioCompra =
-      stockReposicion?.compra?.peso?.peso * stockReposicion?.compra?.precio;
-    console.log({
-      totalPrecioCompra,
-      totalPrecioVenta,
-      theTotal: totalPrecioVenta - totalPrecioCompra,
-    });
-    return totalPrecioVenta - totalPrecioCompra;
-  }
+  // if (this.venta?.fecha && this.venta?.reposicion) {
+  //   let stockReposicion = this.populate('venta.reposicion');
+  //   // console.log({ stockReposicion });
+  //   let totalPrecioVenta = this.venta?.peso?.peso * this.venta?.precio;
+  //   let totalPrecioCompra =
+  //     stockReposicion?.compra?.peso?.peso * stockReposicion?.compra?.precio;
+  //   console.log({
+  //     totalPrecioCompra,
+  //     totalPrecioVenta,
+  //     theTotal: totalPrecioVenta - totalPrecioCompra,
+  //   });
+  //   // return totalPrecioVenta - totalPrecioCompra;
+  //   return 1
+  // }
+  return 0;
 });
 
 stockSchema.virtual('diasTranscurridos').get(function () {
@@ -128,8 +143,9 @@ stockSchema.virtual('diasTranscurridos').get(function () {
   }
 });
 
+
+
 stockSchema.virtual('pesoPromedio').get(function () {
-  console.log('PRUEBA');
   if (this.venta?.fecha) {
     let dias = Math.ceil(
       (new Date(this.venta?.fecha) - new Date(this.compra?.fecha)) /

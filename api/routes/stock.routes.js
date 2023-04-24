@@ -1,7 +1,11 @@
 const router = require('express').Router();
 const Stock = require('../models/Stock.model');
 const Peso = require('../models/Peso.model');
+const multer = require('multer');
+const upload = multer({ dest: './data/' });
 const exportToExcel = require('../utils/exportToExcel');
+const importData = require('../utils/importData');
+const fs = require('fs');
 
 router.get('/', async (req, res, next) => {
   try {
@@ -55,7 +59,10 @@ router.get('/loteNros', async (req, res, next) => {
 router.get('/stockVenta', async (req, res, next) => {
   try {
     const response = await Stock.find({
-      $or: [{ 'venta.fecha': { $exists: false } }, { 'venta.fecha': { $eq: '' } }],
+      $or: [
+        { 'venta.fecha': { $exists: false } },
+        { 'venta.fecha': { $eq: '' } },
+      ],
     });
 
     res.status(200).json({ ok: true, stockVenta: response });
@@ -66,22 +73,12 @@ router.get('/stockVenta', async (req, res, next) => {
 });
 
 router.get('/details/:id', async (req, res, next) => {
-  // console.log('HOWDYYYYY - ', req.params.id);
   try {
-    const response = await Stock.findById(req.params.id)
-      .populate({
-        path: 'pesos',
-        options: { sort: { fecha: 1, createdAt: 1 } },
-        select: ['peso', 'fecha', 'tipo'],
-      })
-      .populate('compra.reposicion')
-      .populate('venta.reposicion');
-    // .populate('compra.peso')
-    // .populate('venta.peso');
-
-    // console.log({ response });
+    const response = await Stock.findById(req.params.id).populate(
+      'compra.reposicion'
+    );
+    // .populate('venta.reposicion');
     if (!response) throw new Error('Invalid Stock ID Provided');
-
     res.status(200).json({ ok: true, stockDetails: response });
   } catch (err) {
     console.log('ERROR -> ', err.message);
@@ -232,6 +229,28 @@ router.delete('/', async (req, res, next) => {
     }, 200);
   } catch (err) {
     console.log('ERROR -> ', err);
+    res.status(200).json({ ok: false, errorMsg: err.message });
+  }
+});
+
+router.post('/upload', upload.single('file0'), async (req, res, next) => {
+  try {
+    const file = req.file;
+
+    fs.readFile(file.path, (err, data) => {
+      if (err) throw err;
+
+      fs.writeFile('./data/' + file.originalname, data, (err) => {
+        if (err) throw err;
+      });
+    });
+
+    if (await importData(file.originalname)) {
+      res.status(200).json({ ok: true });
+    } else {
+      throw new Error('UNKNOWN ERROR');
+    }
+  } catch (err) {
     res.status(200).json({ ok: false, errorMsg: err.message });
   }
 });

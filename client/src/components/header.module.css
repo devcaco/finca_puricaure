@@ -1,6 +1,47 @@
-h1 {
+.header h1 {
   padding-top: 2rem;
   text-align: center;
   padding-bottom: 2rem;
   border-bottom: 1px solid #000;
+}
+
+
+.header {
+  height: 150px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #000;
+}
+
+.header img {
+  height: 100px;
+}
+
+.profile {
+  position:absolute;
+  font-size: 2.5rem;
+  right: 40px;
+  /* width: 800px; */
+  text-align: right;
+  /* border: 1px solid #000; */
+  /* border-radius: 50%; */
+  /* box-sizing: border-box; */
+  /* padding: 15px; */
+  /* padding-right: 5rem; */
+  /* background-color: red; */
+}
+
+.icon {
+  border: 3px solid #000;
+  border-radius: 50%;
+  box-sizing: border-box;
+  padding: 8px;
+  font-size: 3rem;
+  cursor: pointer;
+}
+
+.profilePop {
+  width: 200px;
 }
