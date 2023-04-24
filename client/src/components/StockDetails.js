@@ -48,7 +48,7 @@ const StockDetails = ({ stockId, onClose }) => {
   return (
     <div className={styles.details}>
       <div className={styles.details__header}>
-        <h2>STOCK {stockDetails.serialNro}</h2>
+        <h2>GANADO {stockDetails.serialNro}</h2>
         <div className={styles.errorMsg}>{errorMsg}</div>
       </div>
       {stockDetails && (
@@ -63,13 +63,13 @@ const StockDetails = ({ stockId, onClose }) => {
                 <Spin spinning={dataLoading}>
                   <Row style={{ paddingBottom: '20px' }} id="DATOS_COMPRA">
                     <Col span={24} className={[styles['section__container']]}>
-                      <div>PURCHASE DETAILS</div>
+                      <div>DATOS COMPRA</div>
                       <div className={[styles['section__body']]}>
                         <Row
                           align="middle"
                           className={[styles['section__row']]}
                         >
-                          <Col span={12}>Date Purchased:</Col>
+                          <Col span={12}>Fecha:</Col>
                           <Col span={12}>
                             {!editMode
                               ? !dataLoading &&
@@ -96,7 +96,7 @@ const StockDetails = ({ stockId, onClose }) => {
                           align="middle"
                           className={[styles['section__row']]}
                         >
-                          <Col span={12}>Weight:</Col>
+                          <Col span={12}>Peso:</Col>
                           <Col span={12}>
                             {!editMode
                               ? !dataLoading &&
@@ -142,7 +142,7 @@ const StockDetails = ({ stockId, onClose }) => {
                           align="middle"
                           className={[styles['section__row']]}
                         >
-                          <Col span={12}>Price per weight</Col>
+                          <Col span={12}>Precio por peso</Col>
                           <Col span={12}>
                             {!editMode
                               ? !dataLoading &&
@@ -166,10 +166,11 @@ const StockDetails = ({ stockId, onClose }) => {
                           align="middle"
                           className={[styles['section__row']]}
                         >
-                          <Col span={12}>Total Price:</Col>
+                          <Col span={12}>Precio compra:</Col>
                           <Col span={12}>
                             {!dataLoading &&
-                              '$ ' + stockDetails?.totalPrecioCompra?.toFixed(2)}
+                              '$ ' +
+                                stockDetails?.totalPrecioCompra?.toFixed(2)}
                           </Col>
                         </Row>
                         {stockDetails.compra?.reposicion?.serialNro && (
@@ -177,7 +178,7 @@ const StockDetails = ({ stockId, onClose }) => {
                             align="middle"
                             className={[styles['section__row']]}
                           >
-                            <Col span={12}>Replenishment:</Col>
+                            <Col span={12}>Reposicion:</Col>
                             <Col span={12}>
                               {!editMode
                                 ? !dataLoading &&
@@ -187,7 +188,7 @@ const StockDetails = ({ stockId, onClose }) => {
                                     <Select
                                       style={{ width: '100%' }}
                                       size="middle"
-                                      placeholder={'Cattle Nro'}
+                                      placeholder={'Nro de ganado'}
                                       value={formData?.compra?.reposicion?._id}
                                       showSearch
                                       optionFilterProp="children"
@@ -226,13 +227,13 @@ const StockDetails = ({ stockId, onClose }) => {
                   <Spin spinning={dataLoading}>
                     <Row id="DATOS_VENTA">
                       <Col span={24} className={[styles['section__container']]}>
-                        <div>SALE DETAILS</div>
+                        <div>DATOS VENTA</div>
                         <div className={[styles['section__body']]}>
                           <Row
                             align="middle"
                             className={[styles['section__row']]}
                           >
-                            <Col span={12}>Date Sold:</Col>
+                            <Col span={12}>Fecha:</Col>
                             <Col span={12}>
                               {!editMode
                                 ? !dataLoading &&
@@ -257,17 +258,16 @@ const StockDetails = ({ stockId, onClose }) => {
                             align="middle"
                             className={[styles['section__row']]}
                           >
-                            <Col span={12}>Days Transpired</Col>
+                            <Col span={12}>Dias transcurridos</Col>
                             <Col span={12}>
-                              {!dataLoading &&
-                                stockDetails?.diasTranscurridos}
+                              {!dataLoading && stockDetails?.diasTranscurridos}
                             </Col>
                           </Row>
                           <Row
                             align="middle"
                             className={[styles['section__row']]}
                           >
-                            <Col span={12}>Weight Gain / Day</Col>
+                            <Col span={12}>Peso Aumento p / Dia</Col>
                             <Col span={12}>
                               {!dataLoading &&
                                 stockDetails?.pesoPromedio?.toFixed(2) + ' Kgs'}
@@ -277,7 +277,7 @@ const StockDetails = ({ stockId, onClose }) => {
                             align="middle"
                             className={[styles['section__row']]}
                           >
-                            <Col span={12}>Final Weight</Col>
+                            <Col span={12}>Precio Venta</Col>
                             <Col span={12}>
                               {!editMode
                                 ? !dataLoading &&
@@ -321,7 +321,7 @@ const StockDetails = ({ stockId, onClose }) => {
                             align="middle"
                             className={[styles['section__row']]}
                           >
-                            <Col span={12}>Price per weight</Col>
+                            <Col span={12}>Precio por peso</Col>
                             <Col span={12}>
                               {!dataLoading && !editMode ? (
                                 '$ ' + stockDetails?.venta?.precio
@@ -342,7 +342,7 @@ const StockDetails = ({ stockId, onClose }) => {
                             align="middle"
                             className={[styles['section__row']]}
                           >
-                            <Col span={12}>Total sale price</Col>
+                            <Col span={12}>Precio Venta</Col>
                             <Col span={12}>
                               {!dataLoading &&
                                 '$ ' +
@@ -354,7 +354,7 @@ const StockDetails = ({ stockId, onClose }) => {
                               align="middle"
                               className={[styles['section__row']]}
                             >
-                              <Col span={12}>Replenishment</Col>
+                              <Col span={12}>Reposicion</Col>
                               <Col span={12}>
                                 {!dataLoading &&
                                   stockDetails?.venta?.reposicion?.serialNro}
@@ -379,13 +379,13 @@ const StockDetails = ({ stockId, onClose }) => {
                           span={24}
                           className={[styles['section__container']]}
                         >
-                          <div>PROFIT / LOSS DETAILS</div>
+                          <div>DATOS GANANCIA</div>
                           <div className={[styles['section__body']]}>
                             <Row
                               align="middle"
                               className={[styles['section__row']]}
                             >
-                              <Col span={12}>NET PROFIT</Col>
+                              <Col span={12}>GANANCIA NETA</Col>
                               <Col span={12}></Col>
                             </Row>
                           </div>
@@ -396,7 +396,7 @@ const StockDetails = ({ stockId, onClose }) => {
                 <Spin spinning={dataLoading}>
                   <Row id="DATOS_PESO">
                     <Col span={24} className={[styles['section__container']]}>
-                      <div>WEIGHT DATA</div>
+                      <div>DATOS PESO</div>
                       <div className={[styles['section__body']]}>
                         {!dataLoading &&
                           stockDetails?.pesos?.length &&
@@ -410,12 +410,7 @@ const StockDetails = ({ stockId, onClose }) => {
                                   {new Date(peso.fecha).toLocaleDateString()}
                                 </Col>
                                 <Col span={8}>{peso.peso} Kgs.</Col>
-                                <Col span={8}>
-                                  {peso.tipo &&
-                                    peso.tipo
-                                      .replace('compra', 'purchase')
-                                      .replace('venta', 'sale')}
-                                </Col>
+                                <Col span={8}>{peso.tipo && peso.tipo}</Col>
                               </Row>
                             </Fragment>
                           ))}
@@ -433,10 +428,10 @@ const StockDetails = ({ stockId, onClose }) => {
                 setEditMode(!editMode);
               }}
             >
-              {editMode ? 'Save' : 'Edit'}
+              {editMode ? 'Guardar' : 'Editar'}
             </Button>
             <Button onClick={onClose} style={{ marginTop: '20px' }}>
-              Close
+              Cerrar
             </Button>
           </div>
         </>

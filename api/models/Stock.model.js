@@ -22,19 +22,19 @@ const stockSchema = new Schema(
     stockTipo: {
       type: String,
       enum: [
-        'Holstein Friesian',
-        'Hereford',
-        'Simmental',
-        'Aberdeen Angus',
-        'Belgian Blue',
-        'Limousin',
-        'Brangus',
-        'Red Angus',
-        'Braford',
-        'Belted Galloway',
-        'Brown Swiss',
-        'Beefalo',
-        'Other',
+        'Vacas de Ordeño',
+        'Vacas Cria',
+        'Vacas Paridas',
+        'Vacas Escoteras',
+        'Crias Hembras',
+        'Crias Machos',
+        'Novillas de Viente',
+        'Hembras de Levante',
+        'Machos de Levante',
+        'Machos de Ceba',
+        'Toretes',
+        'Toros',
+        'Otro',
       ],
       required: false,
     },
@@ -142,8 +142,6 @@ stockSchema.virtual('diasTranscurridos').get(function () {
     );
   }
 });
-
-
 
 stockSchema.virtual('pesoPromedio').get(function () {
   if (this.venta?.fecha) {

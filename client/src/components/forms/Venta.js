@@ -52,7 +52,7 @@ const Venta = ({ onClose, selectedStock }) => {
 
   const handleFormError = (formError) => {
     console.log({ formError });
-    setErrorMsg('Error in Form');
+    setErrorMsg('Error en el formulario');
   };
 
   const handleChange = (name, value) => {
@@ -72,7 +72,7 @@ const Venta = ({ onClose, selectedStock }) => {
         (formInput.tipoVenta === 'venta' && !formInput.precio) ||
         (formInput.tipoVenta === 'venta' && !formInput.pesoSalida)
       ) {
-        throw new Error('Invalid Form Inputs');
+        throw new Error('Formulario Invalido');
       }
 
       const response = await axios.post(
@@ -94,7 +94,7 @@ const Venta = ({ onClose, selectedStock }) => {
   return (
     <Spin spinning={loadingData}>
       <div className={styles.form}>
-        <h2>Sale Form</h2>
+        <h2>Registrar Venta / Perdida</h2>
         {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
         <Form
           form={form}
@@ -116,9 +116,14 @@ const Venta = ({ onClose, selectedStock }) => {
           }}
         >
           <Form.Item
-            label="Type"
+            label="Tipo"
             name="tipoVenta"
-            rules={[{ required: true, message: 'Please select a sale type' }]}
+            rules={[
+              {
+                required: true,
+                message: 'Favor seleccione si es venta o perdida',
+              },
+            ]}
             help={''}
           >
             <Select
@@ -127,28 +132,26 @@ const Venta = ({ onClose, selectedStock }) => {
               }}
               options={[
                 {
-                  value: 'sale',
+                  value: 'venta',
                   label: 'Venta',
                 },
                 {
-                  value: 'death / lost',
-                  label: 'Perdida',
+                  value: 'perdida',
+                  label: 'Perdida (Muerte) ',
                 },
               ]}
             />
           </Form.Item>
 
           <Form.Item
-            label="Cattle Number"
+            label="Nro de Ganado"
             name={'nroStock'}
-            rules={[
-              { required: true, message: 'Please select a cattle number' },
-            ]}
+            rules={[{ required: true, message: 'Favor seleccione el ganado' }]}
             help={''}
           >
             <Select
               style={{ minWidth: '200px' }}
-              placeholder={'Cattle Number'}
+              placeholder={'Nro de ganado'}
               showSearch
               optionFilterProp="children"
               onChange={(value) => {
@@ -175,9 +178,14 @@ const Venta = ({ onClose, selectedStock }) => {
           </Form.Item>
 
           <Form.Item
-            label="Date Sold"
+            label="Fecha Venta"
             name="fechaVenta"
-            rules={[{ required: true, message: 'Please select the Sold Date' }]}
+            rules={[
+              {
+                required: true,
+                message: 'Favor seleccione la fecha de la venta',
+              },
+            ]}
             help={''}
           >
             <DatePicker
@@ -189,10 +197,10 @@ const Venta = ({ onClose, selectedStock }) => {
           </Form.Item>
 
           <Form.Item
-            label="Weight"
+            label="Peso Venta"
             name="pesoSalida"
             rules={[
-              { required: true, message: 'Please enter the sold weight' },
+              { required: true, message: 'Favor introduzca el peso de venta' },
             ]}
             help={''}
           >
@@ -232,10 +240,13 @@ const Venta = ({ onClose, selectedStock }) => {
           </Form.Item>
 
           <Form.Item
-            label="Price per Weight"
+            label="Precio por peso"
             name="precio"
             rules={[
-              { required: true, message: 'Please enter the price per weight' },
+              {
+                required: true,
+                message: 'Favor introduzca el precio por peso',
+              },
             ]}
             help={''}
           >
@@ -250,7 +261,7 @@ const Venta = ({ onClose, selectedStock }) => {
             />
           </Form.Item>
 
-          <Form.Item label="Notes" name="notas">
+          <Form.Item label="Notas" name="notas">
             <TextArea rows={4}></TextArea>
           </Form.Item>
           <Form.Item>
@@ -259,12 +270,12 @@ const Venta = ({ onClose, selectedStock }) => {
               htmlType="submit"
               style={{ marginTop: '20px', width: '100%' }}
             >
-              Save
+              Guardar
             </Button>
           </Form.Item>
           <Form.Item>
             <Button onClick={onClose} style={{ width: '100%' }}>
-              Close
+              Cerrar
             </Button>
           </Form.Item>
         </Form>

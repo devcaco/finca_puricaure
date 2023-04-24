@@ -20,15 +20,7 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route
-          path="/"
-          element={
-            <IsPrivate>
-              <Main />
-            </IsPrivate>
-          }
-          loader={checkAuth}
-        />
+        <Route path="/" element={<Main />} loader={checkAuth} />
         <Route path="/login" element={<Login />} />
       </Routes>
     </div>

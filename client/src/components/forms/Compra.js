@@ -20,7 +20,6 @@ const dateFormatList = ['MM/DD/YYYY', 'MM/DD/YY', 'MM-DD-YYYY', 'MM-DD-YY'];
 const { TextArea } = Input;
 
 const Compra = ({ onClose }) => {
-  const [isReposicion, setIsReposicion] = useState(true);
   const [stockReposicion, setStockReposicion] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
   const [nroSerial, setNroSerial] = useState('');
@@ -50,7 +49,7 @@ const Compra = ({ onClose }) => {
   const handleFormError = (error) => {
     console.log('FORM ERROR', error);
 
-    setErrorMsg('Please enter required fields');
+    setErrorMsg('Error - Llenar todos los campos');
   };
 
   const handleSubmit = async (formInput) => {
@@ -62,7 +61,7 @@ const Compra = ({ onClose }) => {
         !formInput.pesoEntrada ||
         !formInput.precio
       ) {
-        throw new Error('Please enter required fields');
+        throw new Error('Favor llenar todos los campos');
       }
 
       const response = await axios.post(
@@ -86,8 +85,6 @@ const Compra = ({ onClose }) => {
     const nroStock = form.getFieldValue('nroStock');
     const nroLote = form.getFieldValue('nroLote');
 
-    console.log(nroStock, nroLote);
-
     if (nroStock && nroLote) {
       nroSerial = nroStock.toString().trim() + '-' + nroLote.toString().trim();
       setNroSerial(nroSerial);
@@ -97,7 +94,7 @@ const Compra = ({ onClose }) => {
   return (
     <div className={styles.form}>
       <h2>
-        Entry Form <br />
+        Formulario de Compra <br />
         {nroSerial}
       </h2>
       {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
@@ -123,9 +120,9 @@ const Compra = ({ onClose }) => {
         }}
       >
         <Form.Item
-          label="Cattle Type"
+          label="Tipo de Ganado"
           name="tipoStock"
-          rules={[{ required: true, message: 'Please Select a Cattle Type' }]}
+          rules={[{ required: true, message: 'Seleccione el tipo de ganado' }]}
           help={''}
         >
           <Select
@@ -138,19 +135,19 @@ const Compra = ({ onClose }) => {
                 label: '-------',
               },
               ...[
-                'Holstein Friesian',
-                'Hereford',
-                'Simmental',
-                'Aberdeen Angus',
-                'Belgian Blue',
-                'Limousin',
-                'Brangus',
-                'Red Angus',
-                'Braford',
-                'Belted Galloway',
-                'Brown Swiss',
-                'Beefalo',
-                'Other',
+                'Vacas de Ordeño',
+                'Vacas Cria',
+                'Vacas Paridas',
+                'Vacas Escoteras',
+                'Crias Hembras',
+                'Crias Machos',
+                'Novillas de Viente',
+                'Hembras de Levante',
+                'Machos de Levante',
+                'Machos de Ceba',
+                'Toretes',
+                'Toros',
+                'Otro',
               ].map((tipo) => ({
                 key: `${tipo}`,
                 value: `${tipo}`,
@@ -160,10 +157,10 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
         <Form.Item
-          label="Date Purchased"
+          label="Fecha Compra"
           name="fecha"
           rules={[
-            { required: true, message: 'Please specify the purchase date' },
+            { required: true, message: 'Favor seleccionar fecha compra' },
           ]}
           help={''}
         >
@@ -176,12 +173,12 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
         <Form.Item
-          label="Cattle Number"
+          label="Numero Ganado"
           name="nroStock"
           rules={[
             {
               required: true,
-              message: 'Please enter Cattle Number',
+              message: 'Favor introducir el nro de ganado',
             },
           ]}
           help={''}
@@ -195,16 +192,17 @@ const Compra = ({ onClose }) => {
         </Form.Item>
 
         <Form.Item
-          label="Batch Number"
+          label="Lote"
           name="nroLote"
           rules={[
-            { required: true, message: '' },
+            { required: true, message: 'Favor introducir el nro de lote' },
             {
               type: 'integer',
               min: 1,
               message: '',
             },
           ]}
+          help={''}
         >
           <InputNumber
             style={{ width: '100%' }}
@@ -217,16 +215,17 @@ const Compra = ({ onClose }) => {
         </Form.Item>
 
         <Form.Item
-          label="Weight"
+          label="Peso Entrada"
           name="pesoEntrada"
           rules={[
-            { required: true, message: '' },
+            { required: true, message: 'Favor introducir el peso de entrada' },
             {
               type: 'number',
               min: 0.5,
               message: '',
             },
           ]}
+          help={''}
         >
           <InputNumber
             onChange={(value) => {
@@ -261,10 +260,10 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
         <Form.Item
-          label="Price per Weight"
+          label="Precio por peso"
           name="precio"
           rules={[
-            { required: true, message: 'Please enter the price per weight' },
+            { required: true, message: 'Favor introducir el precio por peso' },
             {
               type: 'number',
               min: 0.1,
@@ -283,15 +282,15 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
 
-        <Form.Item name="stockReposicion" label="Replenishment?">
+        <Form.Item name="stockReposicion" label="Reposicion?">
           <Select
-            placeholder={'Cattle Number'}
+            placeholder={'Nro de ganado'}
             showSearch
             optionFilterProp="children"
             onChange={(value) => {
               handleChange('stockReposicion', value);
             }}
-            disabled={isReposicion && stockReposicion.length ? false : true}
+            disabled={stockReposicion.length ? false : true}
             filterOption={(input, option) =>
               (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
             }
@@ -309,21 +308,22 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
 
-        <Form.Item label="Notes" name="notas">
+        <Form.Item label="Notas" name="notas">
           <TextArea rows={4}></TextArea>
         </Form.Item>
+        
         <Form.Item>
           <Button
             type="primary"
             htmlType="submit"
             style={{ marginTop: '20px', width: '100%' }}
           >
-            Save
+            Guardar
           </Button>
         </Form.Item>
         <Form.Item>
           <Button onClick={onClose} style={{ width: '100%' }}>
-            Close
+            Cerrar
           </Button>
         </Form.Item>
       </Form>

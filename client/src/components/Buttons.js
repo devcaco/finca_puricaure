@@ -7,7 +7,7 @@ const Buttons = ({ onShowModal, isValid }) => {
   return (
     <div className={styles.buttons}>
       <Button size="large" type="primary" onClick={() => onShowModal('compra')}>
-        Register Purchase
+        Registrar Compra
       </Button>
       <Button
         size="large"
@@ -15,7 +15,7 @@ const Buttons = ({ onShowModal, isValid }) => {
         disabled={!isValid}
         onClick={() => onShowModal('venta')}
       >
-        Register Sale / Death
+        Registrar Venta / Perdida
       </Button>
       <Button
         size="large"
@@ -23,7 +23,7 @@ const Buttons = ({ onShowModal, isValid }) => {
         disabled={!isValid}
         onClick={() => onShowModal('peso')}
       >
-        Register Weight
+        Registrar Peso
       </Button>
     </div>
   );

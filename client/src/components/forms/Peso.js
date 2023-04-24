@@ -40,14 +40,14 @@ const Peso = ({ onClose, selectedStock }) => {
   const handleFormError = (formError) => {
     console.log({ formError });
 
-    setErrorMsg('Please input all required fields');
+    setErrorMsg('Favor llene todo los campos');
   };
 
   const handleSubmit = async (formInput) => {
     try {
       console.log(formInput);
       if (!formInput.fecha || !formInput.nroStock || !formInput.peso) {
-        throw new Error('Invalid Form: Please input all required fields');
+        throw new Error('Favor llene todo los campos');
       }
 
       const response = await axios.post(
@@ -73,7 +73,7 @@ const Peso = ({ onClose, selectedStock }) => {
   return (
     <Spin spinning={loadingData}>
       <div className={styles.form}>
-        <h2>Register Weight Form</h2>
+        <h2>Registrar Peso</h2>
         {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
         <Form
           form={form}
@@ -89,16 +89,19 @@ const Peso = ({ onClose, selectedStock }) => {
             fecha: dayjs(),
             peso: selectedStock?.pesos[0]?.peso,
             nroStock: selectedStock?._id ?? '',
+            unidadPeso: 'kg',
           }}
         >
           {/* <label htmlFor="fecha">Fecha</label> */}
           <Form.Item
-            label="Date"
+            label="Fecha"
             name={'fecha'}
-            rules={[{ required: true, message: 'Please select the date' }]}
+            rules={[{ required: true, message: 'Favor seleccione la fecha' }]}
+            help={''}
           >
             <DatePicker
               format={dateFormatList}
+              style={{ width: '100%' }}
               onChange={(date, dateString) => {
                 handleChange('fecha', dayjs(date, dateFormatList[0]));
               }}
@@ -107,15 +110,14 @@ const Peso = ({ onClose, selectedStock }) => {
 
           {/* <label htmlFor="nroStock">Cattle Number</label> */}
           <Form.Item
-            label="Cattle Number"
+            label="Nro de Ganado"
             name={'nroStock'}
-            rules={[
-              { required: true, message: 'Please select the Cattle Number' },
-            ]}
+            rules={[{ required: true, message: 'Favor seleccione el ganado' }]}
+            help={''}
           >
             <Select
-              style={{ minWidth: '200px' }}
-              placeholder={'Cattle Number'}
+              style={{ width: '100%' }}
+              placeholder={'Nro de ganado'}
               showSearch
               optionFilterProp="children"
               onChange={(value) => {
@@ -143,16 +145,17 @@ const Peso = ({ onClose, selectedStock }) => {
 
           {/* <label htmlFor="peso">Weight</label> */}
           <Form.Item
-            label="Weight"
+            label="Peso"
             name="peso"
             rules={[
-              { required: true, message: 'Please input the Weight' },
+              { required: true, message: 'Favor introduzca el peso' },
               {
                 type: 'number',
                 min: 0.5,
-                message: 'Please enter a valid weight',
+                message: 'Favor introduzca un valor valido en el peso',
               },
             ]}
+            help={''}
           >
             <InputNumber
               onChange={(value) => {
@@ -160,9 +163,11 @@ const Peso = ({ onClose, selectedStock }) => {
               }}
               step={1}
               min={1}
+              style={{ width: '100%' }}
               addonAfter={
                 <Select
                   name="unidadPeso"
+                  defaultValue="kg"
                   onChange={(value) => {
                     handleChange('unidadPeso', value);
                   }}
@@ -184,16 +189,20 @@ const Peso = ({ onClose, selectedStock }) => {
               }
             />
           </Form.Item>
-          <Form.Item noStyle>
+          <Form.Item>
             <Button
               type="primary"
               htmlType="submit"
-              style={{ marginTop: '20px' }}
+              style={{ marginTop: '20px', width: '100%' }}
             >
-              Save
+              Guardar
             </Button>
           </Form.Item>
-          <Button onClick={onClose}>Close</Button>
+          <Form.Item>
+            <Button onClick={onClose} style={{ width: '100%' }}>
+              Cerrar
+            </Button>
+          </Form.Item>
         </Form>
       </div>
     </Spin>

@@ -62,11 +62,11 @@ const UploadFile = ({ onClose }) => {
 
   return (
     <div className={styles.fileUpload}>
-      <h1> Data Import </h1>
+      <h1> Importar Data </h1>
       <div className={styles.errorMsg}>{errorMsg !== null && errorMsg}</div>
       <div>
         <Upload {...props} className={styles.upload}>
-          <Button icon={<UploadOutlined />}>Select File</Button>
+          <Button icon={<UploadOutlined />}>Seleccione el archivo</Button>
         </Upload>
       </div>
       <div className={styles.buttons}>
@@ -76,7 +76,7 @@ const UploadFile = ({ onClose }) => {
           onClick={handleUpload}
           loading={uploading}
         >
-          Start Upload
+          Cargar Archivo
         </Button>
       </div>
     </div>

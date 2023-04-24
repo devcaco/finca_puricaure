@@ -44,38 +44,36 @@ const TheTable = ({
 
   const showConfirm = () => {
     confirm({
-      title: 'Are you sure?',
+      title: 'Esta usted seguro?',
       icon: <ExclamationCircleFilled />,
-      content: 'All selected items will be deleted',
-      okText: 'Yes',
+      content: 'Se borraran todo el ganado seleccionado',
+      okText: 'Si',
       okType: 'danger',
       cancelText: 'No',
       onOk() {
-        console.log('OK');
         onDelete(selectedRows);
       },
       onCancel() {
-        console.log('Cancel');
+        // console.log('Cancel');
       },
     });
   };
 
   const showConfirmExport = () => {
     confirm({
-      title: 'Export Data to XLSX ?',
+      title: 'Exportar data a XLSX ?',
       icon: '',
-      content: 'This will export the current table view to an XLSX file',
-      okText: 'Export',
+      content: 'Se exportará la tabla actual a un archivo XLSX',
+      okText: 'Exportar',
       okType: 'primary',
       width: '430px',
-      cancelText: 'No',
+      cancelText: 'Cancelar',
       onOk() {
-        console.log('OK');
-        // onDelete(selectedRows);
+        // console.log('OK');
         exportData();
       },
       onCancel() {
-        console.log('Cancel');
+        // console.log('Cancel');
       },
     });
   };
@@ -101,7 +99,7 @@ const TheTable = ({
       ),
     },
     {
-      title: 'Batch',
+      title: 'Lote',
       dataIndex: 'loteNro',
       key: 'loteNro',
       sorter: (a, b) => {
@@ -111,27 +109,27 @@ const TheTable = ({
       },
     },
     {
-      title: 'Date Purchased',
+      title: 'Fecha Compra',
       dataIndex: 'compra',
       key: 'fechaCompra',
       render: (compra) => <>{new Date(compra.fecha).toLocaleDateString()}</>,
     },
     {
-      title: 'Price Per Weight',
+      title: 'Precio Compra',
       dataIndex: 'compra',
       key: 'precioCompra',
       render: (compra) => <>{'$ ' + compra.precio.toFixed(2)}</>,
       responsive: ['md'],
     },
     {
-      title: 'Purchased Weight',
+      title: 'Peso Compra',
       dataIndex: 'compra',
       key: 'pesoCompra',
       render: (compra) => <>{compra.peso ? compra.peso.peso + ' kgs' : ''}</>,
       responsive: ['md'],
     },
     {
-      title: 'Total Price',
+      title: 'Total Precio Compra',
       dataIndex: 'compra',
       key: 'precioTotal',
       render: (compra) => (
@@ -145,7 +143,7 @@ const TheTable = ({
       responsive: ['md'],
     },
     {
-      title: 'Last Weight',
+      title: 'Ultimo Peso',
       dataIndex: 'pesos',
       key: 'pesos',
       render: (pesos, rows) => (
@@ -153,7 +151,7 @@ const TheTable = ({
       ),
     },
     {
-      title: 'Sold',
+      title: 'Vendido',
       dataIndex: 'venta',
       key: 'venta',
       responsive: ['md'],
@@ -226,12 +224,12 @@ const TheTable = ({
 
   const items = [
     {
-      label: 'Import Data',
+      label: 'Importar Data',
       key: '1',
       icon: <FileExcelOutlined />,
     },
     {
-      label: 'Export to Excel',
+      label: 'Exportar Data',
       key: '2',
       icon: <FileExcelOutlined />,
     },
@@ -253,12 +251,12 @@ const TheTable = ({
               disabled={!selectedRows.length ? 'disabled' : ''}
               onClick={showConfirm}
             >
-              Delete
+              Borrar
             </Button>
             <Input
               name="search"
               value={filterSearch}
-              placeholder="Search by Cattle Number"
+              placeholder="Nro de Ganado"
               allowClear={true}
               addonBefore={<SearchOutlined />}
               onChange={(e) => {
@@ -274,7 +272,7 @@ const TheTable = ({
                   clearFilterData();
                 }}
               >
-                Clear Filter
+                Borrar Filtro
               </Button>
             </div>
           )}
@@ -285,12 +283,12 @@ const TheTable = ({
               onClick={() => openFilter('filter')}
               style={{ marginRight: '20px' }}
             >
-              Filter
+              Filtrar
             </Button>
             <Dropdown menu={optionsProps}>
               <Button>
                 <Space>
-                  Options
+                  Opciones
                   <DownOutlined />
                 </Space>
               </Button>
