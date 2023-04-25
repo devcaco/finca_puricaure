@@ -19,7 +19,7 @@ const dateFormatList = ['MM/DD/YYYY', 'MM/DD/YY', 'MM-DD-YYYY', 'MM-DD-YY'];
 
 const { TextArea } = Input;
 
-const Venta = ({ onClose, selectedStock }) => {
+const Venta = ({ onClose, selectedStock, langText }) => {
   const [stocks, setStocks] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
   const [form] = Form.useForm();
@@ -52,7 +52,7 @@ const Venta = ({ onClose, selectedStock }) => {
 
   const handleFormError = (formError) => {
     console.log({ formError });
-    setErrorMsg('Error en el formulario');
+    setErrorMsg(langText['modal_sale_form_error']);
   };
 
   const handleChange = (name, value) => {
@@ -72,7 +72,7 @@ const Venta = ({ onClose, selectedStock }) => {
         (formInput.tipoVenta === 'venta' && !formInput.precio) ||
         (formInput.tipoVenta === 'venta' && !formInput.pesoSalida)
       ) {
-        throw new Error('Formulario Invalido');
+        throw new Error(langText['modal_sale_form_error']);
       }
 
       const response = await axios.post(
@@ -94,7 +94,7 @@ const Venta = ({ onClose, selectedStock }) => {
   return (
     <Spin spinning={loadingData}>
       <div className={styles.form}>
-        <h2>Registrar Venta / Perdida</h2>
+        <h2>{langText['modal_sale_title']}</h2>
         {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
         <Form
           form={form}
@@ -116,12 +116,12 @@ const Venta = ({ onClose, selectedStock }) => {
           }}
         >
           <Form.Item
-            label="Tipo"
+            label={langText['modal_sale_label_sale_type']}
             name="tipoVenta"
             rules={[
               {
                 required: true,
-                message: 'Favor seleccione si es venta o perdida',
+                message: langText['modal_sale_label_sale_type_error'],
               },
             ]}
             help={''}
@@ -133,25 +133,30 @@ const Venta = ({ onClose, selectedStock }) => {
               options={[
                 {
                   value: 'venta',
-                  label: 'Venta',
+                  label: langText['modal_sale_label_sale_type_option_sale'],
                 },
                 {
                   value: 'perdida',
-                  label: 'Perdida (Muerte) ',
+                  label: langText['modal_sale_label_sale_type_option_lost'],
                 },
               ]}
             />
           </Form.Item>
 
           <Form.Item
-            label="Nro de Ganado"
+            label={langText['modal_sale_label_cattle']}
             name={'nroStock'}
-            rules={[{ required: true, message: 'Favor seleccione el ganado' }]}
+            rules={[
+              {
+                required: true,
+                message: langText['modal_sale_label_cattle_error'],
+              },
+            ]}
             help={''}
           >
             <Select
               style={{ minWidth: '200px' }}
-              placeholder={'Nro de ganado'}
+              placeholder={langText['modal_sale_label_cattle']}
               showSearch
               optionFilterProp="children"
               onChange={(value) => {
@@ -178,12 +183,12 @@ const Venta = ({ onClose, selectedStock }) => {
           </Form.Item>
 
           <Form.Item
-            label="Fecha Venta"
+            label={langText['modal_sale_label_sale_date']}
             name="fechaVenta"
             rules={[
               {
                 required: true,
-                message: 'Favor seleccione la fecha de la venta',
+                message: langText['modal_sale_label_sale_date_error'],
               },
             ]}
             help={''}
@@ -197,10 +202,13 @@ const Venta = ({ onClose, selectedStock }) => {
           </Form.Item>
 
           <Form.Item
-            label="Peso Venta"
+            label={langText['modal_sale_label_sale_weight']}
             name="pesoSalida"
             rules={[
-              { required: true, message: 'Favor introduzca el peso de venta' },
+              {
+                required: true,
+                message: langText['modal_sale_label_sale_weight_error'],
+              },
             ]}
             help={''}
           >
@@ -240,12 +248,12 @@ const Venta = ({ onClose, selectedStock }) => {
           </Form.Item>
 
           <Form.Item
-            label="Precio por peso"
+            label={langText['modal_sale_label_price_weight']}
             name="precio"
             rules={[
               {
                 required: true,
-                message: 'Favor introduzca el precio por peso',
+                message: langText['modal_sale_label_price_weight_error'],
               },
             ]}
             help={''}
@@ -261,7 +269,7 @@ const Venta = ({ onClose, selectedStock }) => {
             />
           </Form.Item>
 
-          <Form.Item label="Notas" name="notas">
+          <Form.Item label={langText['modal_sale_label_notes']} name="notas">
             <TextArea rows={4}></TextArea>
           </Form.Item>
           <Form.Item>
@@ -270,12 +278,12 @@ const Venta = ({ onClose, selectedStock }) => {
               htmlType="submit"
               style={{ marginTop: '20px', width: '100%' }}
             >
-              Guardar
+              {langText['modal_sale_btn_save']}
             </Button>
           </Form.Item>
           <Form.Item>
             <Button onClick={onClose} style={{ width: '100%' }}>
-              Cerrar
+              {langText['modal_sale_btn_close']}
             </Button>
           </Form.Item>
         </Form>

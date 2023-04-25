@@ -19,7 +19,7 @@ dayjs.extend(customParseFormat);
 const dateFormatList = ['MM/DD/YYYY', 'MM/DD/YY', 'MM-DD-YYYY', 'MM-DD-YY'];
 const { TextArea } = Input;
 
-const Compra = ({ onClose }) => {
+const Compra = ({ onClose, langText }) => {
   const [stockReposicion, setStockReposicion] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
   const [nroSerial, setNroSerial] = useState('');
@@ -49,7 +49,7 @@ const Compra = ({ onClose }) => {
   const handleFormError = (error) => {
     console.log('FORM ERROR', error);
 
-    setErrorMsg('Error - Llenar todos los campos');
+    setErrorMsg(langText['modal_purchase_form_error']);
   };
 
   const handleSubmit = async (formInput) => {
@@ -61,7 +61,7 @@ const Compra = ({ onClose }) => {
         !formInput.pesoEntrada ||
         !formInput.precio
       ) {
-        throw new Error('Favor llenar todos los campos');
+        throw new Error(langText['modal_purchase_form_error']);
       }
 
       const response = await axios.post(
@@ -94,7 +94,7 @@ const Compra = ({ onClose }) => {
   return (
     <div className={styles.form}>
       <h2>
-        Registrar Compra <br />
+        {langText['modal_purchase_title']} <br />
         {nroSerial}
       </h2>
       {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
@@ -120,9 +120,14 @@ const Compra = ({ onClose }) => {
         }}
       >
         <Form.Item
-          label="Tipo de Ganado"
+          label={langText['modal_purchase_label_cattle_type']}
           name="tipoStock"
-          rules={[{ required: true, message: 'Seleccione el tipo de ganado' }]}
+          rules={[
+            {
+              required: true,
+              message: langText['modal_purchase_label_cattle_type_error'],
+            },
+          ]}
           help={''}
         >
           <Select
@@ -134,21 +139,7 @@ const Compra = ({ onClose }) => {
                 value: '',
                 label: '-------',
               },
-              ...[
-                'Vacas de Ordeño',
-                'Vacas Cria',
-                'Vacas Paridas',
-                'Vacas Escoteras',
-                'Crias Hembras',
-                'Crias Machos',
-                'Novillas de Viente',
-                'Hembras de Levante',
-                'Machos de Levante',
-                'Machos de Ceba',
-                'Toretes',
-                'Toros',
-                'Otro',
-              ].map((tipo) => ({
+              ...langText['stock_types'].map((tipo) => ({
                 key: `${tipo}`,
                 value: `${tipo}`,
                 label: `${tipo}`,
@@ -157,10 +148,13 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
         <Form.Item
-          label="Fecha Compra"
+          label={langText['modal_purchase_label_purchase_date']}
           name="fecha"
           rules={[
-            { required: true, message: 'Favor seleccionar fecha compra' },
+            {
+              required: true,
+              message: langText['modal_purchase_label_purchase_date_error'],
+            },
           ]}
           help={''}
         >
@@ -173,12 +167,12 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
         <Form.Item
-          label="Numero Ganado"
+          label={langText['modal_purchase_label_cattle_nro']}
           name="nroStock"
           rules={[
             {
               required: true,
-              message: 'Favor introducir el nro de ganado',
+              message: langText['modal_purchase_label_cattle_nro_error'],
             },
           ]}
           help={''}
@@ -192,10 +186,13 @@ const Compra = ({ onClose }) => {
         </Form.Item>
 
         <Form.Item
-          label="Lote"
+          label={langText['modal_purchase_label_cattle_batch']}
           name="nroLote"
           rules={[
-            { required: true, message: 'Favor introducir el nro de lote' },
+            {
+              required: true,
+              message: langText['modal_purchase_label_cattle_batch_error'],
+            },
             {
               type: 'integer',
               min: 1,
@@ -215,14 +212,17 @@ const Compra = ({ onClose }) => {
         </Form.Item>
 
         <Form.Item
-          label="Peso Entrada"
+          label={langText['modal_purchase_label_purchase_weight']}
           name="pesoEntrada"
           rules={[
-            { required: true, message: 'Favor introducir el peso de entrada' },
+            {
+              required: true,
+              message: langText['modal_purchase_label_purchase_weight_error'],
+            },
             {
               type: 'number',
               min: 0.5,
-              message: '',
+              message: langText['modal_purchase_label_purchase_weight_error_2'],
             },
           ]}
           help={''}
@@ -260,16 +260,20 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
         <Form.Item
-          label="Precio por peso"
+          label={langText['modal_purchase_label_price_weight']}
           name="precio"
           rules={[
-            { required: true, message: 'Favor introducir el precio por peso' },
+            {
+              required: true,
+              message: langText['modal_purchase_label_price_weight_error'],
+            },
             {
               type: 'number',
               min: 0.1,
-              message: '',
+              message: langText['modal_purchase_label_price_weight_error_2'],
             },
           ]}
+          help={''}
         >
           <InputNumber
             style={{ width: '100%' }}
@@ -282,9 +286,14 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
 
-        <Form.Item name="stockReposicion" label="Reposicion?">
+        <Form.Item
+          name="stockReposicion"
+          label={langText['modal_purchase_label_replenishment']}
+        >
           <Select
-            placeholder={'Nro de ganado'}
+            placeholder={
+              langText['modal_purchase_label_replenishment_placeholder']
+            }
             showSearch
             optionFilterProp="children"
             onChange={(value) => {
@@ -308,22 +317,22 @@ const Compra = ({ onClose }) => {
           />
         </Form.Item>
 
-        <Form.Item label="Notas" name="notas">
+        <Form.Item label={langText['modal_purchase_label_notes']} name="notas">
           <TextArea rows={4}></TextArea>
         </Form.Item>
-        
+
         <Form.Item>
           <Button
             type="primary"
             htmlType="submit"
             style={{ marginTop: '20px', width: '100%' }}
           >
-            Guardar
+            {langText['modal_purchase_btn_save']}
           </Button>
         </Form.Item>
         <Form.Item>
           <Button onClick={onClose} style={{ width: '100%' }}>
-            Cerrar
+            {langText['modal_purchase_btn_close']}
           </Button>
         </Form.Item>
       </Form>

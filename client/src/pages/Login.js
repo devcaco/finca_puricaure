@@ -11,7 +11,7 @@ import UserContext from '../context/User.context';
 
 import main_logo from '../assets/logo_main.png';
 
-const Login = () => {
+const Login = ({ langText, showLogo }) => {
   const [alertActive, setAlertActive] = useState(false);
   const [alertMsg, setAlertMsg] = useState('');
   const [alertType, setAlertType] = useState('error');
@@ -83,11 +83,15 @@ const Login = () => {
   return (
     <div className={styles.login__container}>
       <div className={styles.login__header}>
-        <img src={main_logo} alt="Please login to access full functionality" />
+        {showLogo ? (
+          <img src={main_logo} alt="" />
+        ) : (
+          <h1>{langText['main_title']}</h1>
+        )}
       </div>
       <div className={styles.login__body}>
         <div>
-          <h1>Welcome, Please login</h1>
+          <h1>{langText['login_page_title']}</h1>
           <div className={styles.alert}>
             {alertActive && (
               <Alert
@@ -101,12 +105,16 @@ const Login = () => {
           </div>
         </div>
         <div className={styles['login__form-container']}>
-          <LoginForm showAlert={showAlert} handleLogin={handleLogin} />
+          <LoginForm
+            showAlert={showAlert}
+            handleLogin={handleLogin}
+            langText={langText}
+          />
         </div>
 
         <div>
-          <Button type="link">Forgot Password?</Button> |
-          <Button type="link">Request Access</Button>
+          <Button type="link">{langText['login_page_forgot_pwd']}</Button> |
+          <Button type="link">{langText['login_page_register']}</Button>
         </div>
       </div>
     </div>

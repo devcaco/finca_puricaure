@@ -31,6 +31,7 @@ const TheTable = ({
   loading,
   clearSelected,
   openUpload,
+  langText,
 }) => {
   const { filterSearch, setFilterSearch, isFilterActive, clearFilterData } =
     useContext(FilterContext);
@@ -44,12 +45,12 @@ const TheTable = ({
 
   const showConfirm = () => {
     confirm({
-      title: 'Esta usted seguro?',
+      title: langText['confirm_delete_title'],
       icon: <ExclamationCircleFilled />,
-      content: 'Se borraran todo el ganado seleccionado',
-      okText: 'Si',
+      content: langText['confirm_delete_body'],
+      okText: langText['confirm_delete_btn_ok'],
       okType: 'danger',
-      cancelText: 'No',
+      cancelText: langText['confirm_delete_btn_cancel'],
       onOk() {
         onDelete(selectedRows);
       },
@@ -61,13 +62,13 @@ const TheTable = ({
 
   const showConfirmExport = () => {
     confirm({
-      title: 'Exportar data a XLSX ?',
+      title: langText['confirm_export_title'],
       icon: '',
-      content: 'Se exportará la tabla actual a un archivo XLSX',
-      okText: 'Exportar',
+      content: langText['confirm_export_body'],
+      okText: langText['confirm_export_btn_export'],
       okType: 'primary',
       width: '430px',
-      cancelText: 'Cancelar',
+      cancelText: langText['confirm_export_btn_cancel'],
       onOk() {
         // console.log('OK');
         exportData();
@@ -80,7 +81,7 @@ const TheTable = ({
 
   const columns = [
     {
-      title: 'Nro',
+      title: langText['table_header_cattle_nbr'],
       dataIndex: 'stockNro',
       key: 'stockNro',
       sorter: (a, b) => {
@@ -99,7 +100,7 @@ const TheTable = ({
       ),
     },
     {
-      title: 'Lote',
+      title: langText['table_header_batch_nbr'],
       dataIndex: 'loteNro',
       key: 'loteNro',
       sorter: (a, b) => {
@@ -109,27 +110,27 @@ const TheTable = ({
       },
     },
     {
-      title: 'Fecha Compra',
+      title: langText['table_header_purchased_date'],
       dataIndex: 'compra',
       key: 'fechaCompra',
       render: (compra) => <>{new Date(compra.fecha).toLocaleDateString()}</>,
     },
     {
-      title: 'Precio Compra',
+      title: langText['table_header_price_per_weight'],
       dataIndex: 'compra',
       key: 'precioCompra',
       render: (compra) => <>{'$ ' + compra.precio.toFixed(2)}</>,
       responsive: ['md'],
     },
     {
-      title: 'Peso Compra',
+      title: langText['table_header_purchased_weight'],
       dataIndex: 'compra',
       key: 'pesoCompra',
       render: (compra) => <>{compra.peso ? compra.peso.peso + ' kgs' : ''}</>,
       responsive: ['md'],
     },
     {
-      title: 'Total Precio Compra',
+      title: langText['table_header_purchased_total_price'],
       dataIndex: 'compra',
       key: 'precioTotal',
       render: (compra) => (
@@ -143,7 +144,7 @@ const TheTable = ({
       responsive: ['md'],
     },
     {
-      title: 'Ultimo Peso',
+      title: langText['table_header_last_weight'],
       dataIndex: 'pesos',
       key: 'pesos',
       render: (pesos, rows) => (
@@ -151,7 +152,7 @@ const TheTable = ({
       ),
     },
     {
-      title: 'Vendido',
+      title: langText['table_header_sold'],
       dataIndex: 'venta',
       key: 'venta',
       responsive: ['md'],
@@ -224,12 +225,12 @@ const TheTable = ({
 
   const items = [
     {
-      label: 'Importar Data',
+      label: langText['table_btn_options_import'],
       key: '1',
       icon: <FileExcelOutlined />,
     },
     {
-      label: 'Exportar Data',
+      label: langText['table_btn_options_export'],
       key: '2',
       icon: <FileExcelOutlined />,
     },
@@ -251,12 +252,12 @@ const TheTable = ({
               disabled={!selectedRows.length ? 'disabled' : ''}
               onClick={showConfirm}
             >
-              Borrar
+              {langText['table_btn_delete']}
             </Button>
             <Input
               name="search"
               value={filterSearch}
-              placeholder="Nro de Ganado"
+              placeholder={langText['table_search_placeholder']}
               allowClear={true}
               addonBefore={<SearchOutlined />}
               onChange={(e) => {
@@ -272,7 +273,7 @@ const TheTable = ({
                   clearFilterData();
                 }}
               >
-                Borrar Filtro
+                {langText['table_btn_clear_filter']}
               </Button>
             </div>
           )}
@@ -283,14 +284,12 @@ const TheTable = ({
               onClick={() => openFilter('filter')}
               style={{ marginRight: '20px' }}
             >
-              Filtrar
+              {langText['table_btn_filter']}
             </Button>
             <Dropdown menu={optionsProps}>
               <Button>
-                <Space>
-                  Opciones
-                  <DownOutlined />
-                </Space>
+                {langText['table_btn_options']}
+                <DownOutlined />
               </Button>
             </Dropdown>
           </div>

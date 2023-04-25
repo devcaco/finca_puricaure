@@ -3,11 +3,12 @@ import { Button } from 'antd';
 
 import styles from './buttons.module.css';
 
-const Buttons = ({ onShowModal, isValid }) => {
+const Buttons = ({ onShowModal, isValid, langText }) => {
+
   return (
     <div className={styles.buttons}>
       <Button size="large" type="primary" onClick={() => onShowModal('compra')}>
-        Registrar Compra
+        {langText['btn_register_purchase']}
       </Button>
       <Button
         size="large"
@@ -15,7 +16,7 @@ const Buttons = ({ onShowModal, isValid }) => {
         disabled={!isValid}
         onClick={() => onShowModal('venta')}
       >
-        Registrar Venta / Perdida
+        {langText['btn_register_sale']}
       </Button>
       <Button
         size="large"
@@ -23,7 +24,7 @@ const Buttons = ({ onShowModal, isValid }) => {
         disabled={!isValid}
         onClick={() => onShowModal('peso')}
       >
-        Registrar Peso
+        {langText['btn_register_weight']}
       </Button>
     </div>
   );

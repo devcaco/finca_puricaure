@@ -10,7 +10,7 @@ import styles from './StockDetails.module.css';
 dayjs.extend(customParseFormat);
 const dateFormatList = ['MM/DD/YYYY', 'MM/DD/YY', 'MM-DD-YYYY', 'MM-DD-YY'];
 
-const StockDetails = ({ stockId, onClose }) => {
+const StockDetails = ({ stockId, onClose, langText }) => {
   const [errorMsg, setErrorMsg] = useState('');
   const [stockDetails, setStockDetails] = useState({});
   const [editMode, setEditMode] = useState(false);
@@ -30,7 +30,13 @@ const StockDetails = ({ stockId, onClose }) => {
 
         if (response.data.ok) {
           const data = response.data.stockDetails;
-          setStockDetails(data);
+          let totalGanancia = 0;
+          if (data.venta?.reposicion) {
+            const precioVenta = data.totalPrecioVenta;
+            const precioReposicion = data.venta?.reposicion?.totalPrecioCompra;
+            totalGanancia = precioVenta - precioReposicion;
+          }
+          setStockDetails({ ...data, totalGanancia });
           setformData(data);
         } else throw new Error(response.data.errorMsg);
         setDataLoading(false);
@@ -48,7 +54,9 @@ const StockDetails = ({ stockId, onClose }) => {
   return (
     <div className={styles.details}>
       <div className={styles.details__header}>
-        <h2>GANADO {stockDetails.serialNro}</h2>
+        <h2>
+          {langText['stock_details_title']} {stockDetails.serialNro}
+        </h2>
         <div className={styles.errorMsg}>{errorMsg}</div>
       </div>
       {stockDetails && (
@@ -63,13 +71,17 @@ const StockDetails = ({ stockId, onClose }) => {
                 <Spin spinning={dataLoading}>
                   <Row style={{ paddingBottom: '20px' }} id="DATOS_COMPRA">
                     <Col span={24} className={[styles['section__container']]}>
-                      <div>DATOS COMPRA</div>
+                      <div>
+                        {langText['stock_details_purchase_details_title']}
+                      </div>
                       <div className={[styles['section__body']]}>
                         <Row
                           align="middle"
                           className={[styles['section__row']]}
                         >
-                          <Col span={12}>Fecha:</Col>
+                          <Col span={12}>
+                            {langText['stock_details_purchase_label_date']}
+                          </Col>
                           <Col span={12}>
                             {!editMode
                               ? !dataLoading &&
@@ -96,7 +108,9 @@ const StockDetails = ({ stockId, onClose }) => {
                           align="middle"
                           className={[styles['section__row']]}
                         >
-                          <Col span={12}>Peso:</Col>
+                          <Col span={12}>
+                            {langText['stock_details_purchase_label_weight']}
+                          </Col>
                           <Col span={12}>
                             {!editMode
                               ? !dataLoading &&
@@ -142,7 +156,9 @@ const StockDetails = ({ stockId, onClose }) => {
                           align="middle"
                           className={[styles['section__row']]}
                         >
-                          <Col span={12}>Precio por peso</Col>
+                          <Col span={12}>
+                            {langText['stock_details_purchase_label_price']}
+                          </Col>
                           <Col span={12}>
                             {!editMode
                               ? !dataLoading &&
@@ -166,7 +182,13 @@ const StockDetails = ({ stockId, onClose }) => {
                           align="middle"
                           className={[styles['section__row']]}
                         >
-                          <Col span={12}>Precio compra:</Col>
+                          <Col span={12}>
+                            {
+                              langText[
+                                'stock_details_purchase_label_total_price'
+                              ]
+                            }
+                          </Col>
                           <Col span={12}>
                             {!dataLoading &&
                               '$ ' +
@@ -178,7 +200,13 @@ const StockDetails = ({ stockId, onClose }) => {
                             align="middle"
                             className={[styles['section__row']]}
                           >
-                            <Col span={12}>Reposicion:</Col>
+                            <Col span={12}>
+                              {
+                                langText[
+                                  'stock_details_purchase_label_replenishment'
+                                ]
+                              }
+                            </Col>
                             <Col span={12}>
                               {!editMode
                                 ? !dataLoading &&
@@ -188,7 +216,9 @@ const StockDetails = ({ stockId, onClose }) => {
                                     <Select
                                       style={{ width: '100%' }}
                                       size="middle"
-                                      placeholder={'Nro de ganado'}
+                                      placeholder={
+                                        langText['table_search_placeholder']
+                                      }
                                       value={formData?.compra?.reposicion?._id}
                                       showSearch
                                       optionFilterProp="children"
@@ -227,13 +257,17 @@ const StockDetails = ({ stockId, onClose }) => {
                   <Spin spinning={dataLoading}>
                     <Row id="DATOS_VENTA">
                       <Col span={24} className={[styles['section__container']]}>
-                        <div>DATOS VENTA</div>
+                        <div>
+                          {langText['stock_details_sale_details_title']}
+                        </div>
                         <div className={[styles['section__body']]}>
                           <Row
                             align="middle"
                             className={[styles['section__row']]}
                           >
-                            <Col span={12}>Fecha:</Col>
+                            <Col span={12}>
+                              {langText['stock_details_sale_label_date']}
+                            </Col>
                             <Col span={12}>
                               {!editMode
                                 ? !dataLoading &&
@@ -258,7 +292,9 @@ const StockDetails = ({ stockId, onClose }) => {
                             align="middle"
                             className={[styles['section__row']]}
                           >
-                            <Col span={12}>Dias transcurridos</Col>
+                            <Col span={12}>
+                              {langText['stock_details_sale_label_days']}
+                            </Col>
                             <Col span={12}>
                               {!dataLoading && stockDetails?.diasTranscurridos}
                             </Col>
@@ -267,7 +303,9 @@ const StockDetails = ({ stockId, onClose }) => {
                             align="middle"
                             className={[styles['section__row']]}
                           >
-                            <Col span={12}>Peso Aumento p / Dia</Col>
+                            <Col span={12}>
+                              {langText['stock_details_sale_label_avg_weight']}
+                            </Col>
                             <Col span={12}>
                               {!dataLoading &&
                                 stockDetails?.pesoPromedio?.toFixed(2) + ' Kgs'}
@@ -277,7 +315,9 @@ const StockDetails = ({ stockId, onClose }) => {
                             align="middle"
                             className={[styles['section__row']]}
                           >
-                            <Col span={12}>Precio Venta</Col>
+                            <Col span={12}>
+                              {langText['stock_details_sale_label_weight']}
+                            </Col>
                             <Col span={12}>
                               {!editMode
                                 ? !dataLoading &&
@@ -321,7 +361,9 @@ const StockDetails = ({ stockId, onClose }) => {
                             align="middle"
                             className={[styles['section__row']]}
                           >
-                            <Col span={12}>Precio por peso</Col>
+                            <Col span={12}>
+                              {langText['stock_details_sale_label_price']}
+                            </Col>
                             <Col span={12}>
                               {!dataLoading && !editMode ? (
                                 '$ ' + stockDetails?.venta?.precio
@@ -342,7 +384,9 @@ const StockDetails = ({ stockId, onClose }) => {
                             align="middle"
                             className={[styles['section__row']]}
                           >
-                            <Col span={12}>Precio Venta</Col>
+                            <Col span={12}>
+                              {langText['stock_details_sale_label_total_price']}
+                            </Col>
                             <Col span={12}>
                               {!dataLoading &&
                                 '$ ' +
@@ -354,7 +398,13 @@ const StockDetails = ({ stockId, onClose }) => {
                               align="middle"
                               className={[styles['section__row']]}
                             >
-                              <Col span={12}>Reposicion</Col>
+                              <Col span={12}>
+                                {
+                                  langText[
+                                    'stock_details_sale_label_replenishment'
+                                  ]
+                                }
+                              </Col>
                               <Col span={12}>
                                 {!dataLoading &&
                                   stockDetails?.venta?.reposicion?.serialNro}
@@ -379,14 +429,18 @@ const StockDetails = ({ stockId, onClose }) => {
                           span={24}
                           className={[styles['section__container']]}
                         >
-                          <div>DATOS GANANCIA</div>
+                          <div>
+                            {langText['stock_details_profit_details_title']}
+                          </div>
                           <div className={[styles['section__body']]}>
                             <Row
                               align="middle"
                               className={[styles['section__row']]}
                             >
-                              <Col span={12}>GANANCIA NETA</Col>
-                              <Col span={12}></Col>
+                              <Col span={12}>
+                                {langText['stock_details_profit_text']}
+                              </Col>
+                              <Col span={12}>$ {stockDetails?.totalGanancia?.toFixed(2)}</Col>
                             </Row>
                           </div>
                         </Col>
@@ -396,7 +450,9 @@ const StockDetails = ({ stockId, onClose }) => {
                 <Spin spinning={dataLoading}>
                   <Row id="DATOS_PESO">
                     <Col span={24} className={[styles['section__container']]}>
-                      <div>DATOS PESO</div>
+                      <div>
+                        {langText['stock_details_weight_details_title']}
+                      </div>
                       <div className={[styles['section__body']]}>
                         {!dataLoading &&
                           stockDetails?.pesos?.length &&
@@ -410,7 +466,28 @@ const StockDetails = ({ stockId, onClose }) => {
                                   {new Date(peso.fecha).toLocaleDateString()}
                                 </Col>
                                 <Col span={8}>{peso.peso} Kgs.</Col>
-                                <Col span={8}>{peso.tipo && peso.tipo}</Col>
+                                <Col span={8}>
+                                  {peso.tipo &&
+                                    peso.tipo
+                                      .replace(
+                                        'venta',
+                                        langText[
+                                          'stock_details_weight_sale_text'
+                                        ]
+                                      )
+                                      .replace(
+                                        'compra',
+                                        langText[
+                                          'stock_details_weight_purchase_text'
+                                        ]
+                                      )
+                                      .replace(
+                                        'control',
+                                        langText[
+                                          'stock_details_weight_control_text'
+                                        ]
+                                      )}
+                                </Col>
                               </Row>
                             </Fragment>
                           ))}
@@ -428,10 +505,12 @@ const StockDetails = ({ stockId, onClose }) => {
                 setEditMode(!editMode);
               }}
             >
-              {editMode ? 'Guardar' : 'Editar'}
+              {editMode
+                ? langText['stock_details_btn_save']
+                : langText['stock_details_btn_edit']}
             </Button>
             <Button onClick={onClose} style={{ marginTop: '20px' }}>
-              Cerrar
+              {langText['stock_details_btn_close']}
             </Button>
           </div>
         </>

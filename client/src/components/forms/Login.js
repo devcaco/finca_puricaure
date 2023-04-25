@@ -4,10 +4,10 @@ import { LockOutlined, UserOutlined } from '@ant-design/icons';
 
 import styles from './Login.module.css';
 
-export const Login = ({ showAlert, handleLogin }) => {
+export const Login = ({ showAlert, handleLogin, langText }) => {
   const handleFormError = (formErrors) => {
     console.log({ formErrors });
-    showAlert('error', 'Prease provide a username and password');
+    showAlert('error', langText['login_form_required_fields']);
   };
 
   const handleSubmit = (formInput) => {
@@ -31,29 +31,36 @@ export const Login = ({ showAlert, handleLogin }) => {
         onFinishFailed={handleFormError}
       >
         <Form.Item
-          label="User Name"
+          label={langText['login_form_label_username']}
           name="userName"
-          rules={[{ required: true, message: 'Please provide your username' }]}
+          rules={[
+            { required: true, message: langText['login_form_label_username_error'] },
+          ]}
           help={''}
         >
-          <Input prefix={<UserOutlined />} placeholder="UserName"></Input>
+          <Input
+            prefix={<UserOutlined />}
+            placeholder={langText['login_form_label_username_placeholder']}
+          ></Input>
         </Form.Item>
         <Form.Item
-          label="Password"
+          label={langText['login_form_label_pwd']}
           name="pwd"
-          rules={[{ required: true, message: 'Please provide your password' }]}
+          rules={[
+            { required: true, message: langText['login_form_label_pwd_error'] },
+          ]}
           help={''}
         >
           <Input.Password
             prefix={<LockOutlined />}
             type="password"
-            placeholder="Password"
+            placeholder={langText['login_form_label_pwd_placeholder']}
           ></Input.Password>
         </Form.Item>
 
         <Form.Item className={styles.login__buttons}>
           <Button htmlType="submit" type="primary">
-            Login
+            {langText['login_form_btn_login']}
           </Button>
         </Form.Item>
       </Form>

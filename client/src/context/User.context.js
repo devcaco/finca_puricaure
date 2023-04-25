@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import langFile from '../assets/lang.json';
 
 const UserContext = createContext();
 
@@ -9,12 +10,18 @@ export const UserProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userMessage, setUserMessage] = useState(null);
+  const [lang, setLang] = useState(process.env.REACT_APP_LANG || 'es');
+  const [langText, setLangText] = useState({ ...langFile[lang] });
 
   const navigate = useNavigate();
 
   useEffect(() => {
     authenticateUser();
   }, []);
+
+  useEffect(() => {
+    setLangText({ ...langFile[lang] });
+  }, [lang]);
 
   const storeToken = (token) => {
     localStorage.setItem('authToken', token);
@@ -76,6 +83,8 @@ export const UserProvider = ({ children }) => {
           logOutUser,
           userMessage,
           setUserMessage,
+          langText,
+          setLang,
         }}
       >
         {children}

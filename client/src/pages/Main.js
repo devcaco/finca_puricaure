@@ -17,7 +17,7 @@ import FilterContext from '../context/Filter.context';
 
 import styles from './Main.module.css';
 
-function Main() {
+function Main({ langText, allowLang, allowAuth, showLogo }) {
   const { filterData, filterSearch } = useContext(FilterContext);
 
   const [showModal, setShowModal] = useState(false);
@@ -247,7 +247,7 @@ function Main() {
 
   return (
     <div className={styles.main}>
-      <Header />
+      <Header allowLang={allowLang} allowAuth={allowAuth} showLogo={showLogo} />
       <Modal
         open={showModal}
         centered
@@ -256,26 +256,47 @@ function Main() {
         width={modalWidth}
         destroyOnClose={true}
       >
-        {activeForm === 'compra' && <Compra onClose={handleOnClose} />}
+        {activeForm === 'compra' && (
+          <Compra onClose={handleOnClose} langText={langText} />
+        )}
         {activeForm === 'venta' && (
-          <Venta onClose={handleOnClose} selectedStock={lastSelected} />
+          <Venta
+            onClose={handleOnClose}
+            selectedStock={lastSelected}
+            langText={langText}
+          />
         )}
         {activeForm === 'peso' && (
           <Peso
             onClose={handleOnClose}
             selectedStock={lastSelected}
             stockId={lastSelected?._id}
+            langText={langText}
           />
         )}
         {activeForm === 'details' && (
-          <StockDetails onClose={handleOnClose} stockId={stockId} />
+          <StockDetails
+            onClose={handleOnClose}
+            stockId={stockId}
+            langText={langText}
+          />
         )}
         {activeForm === 'filter' && (
-          <Filter onClose={handleOnClose} stockCount={stocks.length} />
+          <Filter
+            onClose={handleOnClose}
+            stockCount={stocks.length}
+            langText={langText}
+          />
         )}
-        {activeForm === 'upload' && <UploadFile onClose={handleOnClose} />}
+        {activeForm === 'upload' && (
+          <UploadFile onClose={handleOnClose} langText={langText} />
+        )}
       </Modal>
-      <Buttons onShowModal={handleShowModal} isValid={!!lastSelected} />
+      <Buttons
+        onShowModal={handleShowModal}
+        isValid={!!lastSelected}
+        langText={langText}
+      />
       <TheTable
         loading={loading}
         stocks={stocks}
@@ -291,6 +312,7 @@ function Main() {
               : stock[stock.length - 1]
           );
         }, [])}
+        langText={langText}
       />
     </div>
   );

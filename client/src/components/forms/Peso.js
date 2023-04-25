@@ -9,7 +9,7 @@ import styles from './peso.module.css';
 dayjs.extend(customParseFormat);
 const dateFormatList = ['MM/DD/YYYY', 'MM/DD/YY', 'MM-DD-YYYY', 'MM-DD-YY'];
 
-const Peso = ({ onClose, selectedStock }) => {
+const Peso = ({ onClose, selectedStock, langText }) => {
   const [errorMsg, setErrorMsg] = useState('');
   const [stocks, setStocks] = useState([]);
   const [loadingData, setLoadingData] = useState(false);
@@ -40,14 +40,14 @@ const Peso = ({ onClose, selectedStock }) => {
   const handleFormError = (formError) => {
     console.log({ formError });
 
-    setErrorMsg('Favor llene todo los campos');
+    setErrorMsg(langText['modal_weight_form_error']);
   };
 
   const handleSubmit = async (formInput) => {
     try {
       console.log(formInput);
       if (!formInput.fecha || !formInput.nroStock || !formInput.peso) {
-        throw new Error('Favor llene todo los campos');
+        throw new Error(langText['modal_weight_form_error']);
       }
 
       const response = await axios.post(
@@ -73,7 +73,7 @@ const Peso = ({ onClose, selectedStock }) => {
   return (
     <Spin spinning={loadingData}>
       <div className={styles.form}>
-        <h2>Registrar Peso</h2>
+        <h2>{langText['modal_weight_title']}</h2>
         {errorMsg && <div className={styles.errorMsg}>{errorMsg}</div>}
         <Form
           form={form}
@@ -94,9 +94,14 @@ const Peso = ({ onClose, selectedStock }) => {
         >
           {/* <label htmlFor="fecha">Fecha</label> */}
           <Form.Item
-            label="Fecha"
+            label={langText['modal_weight_label_weight_date']}
             name={'fecha'}
-            rules={[{ required: true, message: 'Favor seleccione la fecha' }]}
+            rules={[
+              {
+                required: true,
+                message: langText['modal_weight_label_weight_date_error'],
+              },
+            ]}
             help={''}
           >
             <DatePicker
@@ -110,9 +115,14 @@ const Peso = ({ onClose, selectedStock }) => {
 
           {/* <label htmlFor="nroStock">Cattle Number</label> */}
           <Form.Item
-            label="Nro de Ganado"
+            label={langText['modal_weight_label_cattle']}
             name={'nroStock'}
-            rules={[{ required: true, message: 'Favor seleccione el ganado' }]}
+            rules={[
+              {
+                required: true,
+                message: langText['modal_weight_label_cattle_error'],
+              },
+            ]}
             help={''}
           >
             <Select
@@ -145,14 +155,17 @@ const Peso = ({ onClose, selectedStock }) => {
 
           {/* <label htmlFor="peso">Weight</label> */}
           <Form.Item
-            label="Peso"
+            label={langText['modal_weight_label_weight']}
             name="peso"
             rules={[
-              { required: true, message: 'Favor introduzca el peso' },
+              {
+                required: true,
+                message: langText['modal_weight_label_weight_error'],
+              },
               {
                 type: 'number',
                 min: 0.5,
-                message: 'Favor introduzca un valor valido en el peso',
+                message: langText['modal_weight_label_weight_error_2'],
               },
             ]}
             help={''}
@@ -195,12 +208,12 @@ const Peso = ({ onClose, selectedStock }) => {
               htmlType="submit"
               style={{ marginTop: '20px', width: '100%' }}
             >
-              Guardar
+              {langText['modal_weight_btn_save']}
             </Button>
           </Form.Item>
           <Form.Item>
             <Button onClick={onClose} style={{ width: '100%' }}>
-              Cerrar
+              {langText['modal_weight_btn_close']}
             </Button>
           </Form.Item>
         </Form>

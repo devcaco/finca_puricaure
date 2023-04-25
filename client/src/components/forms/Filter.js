@@ -13,7 +13,7 @@ const dateFormatList = ['MM/DD/YYYY', 'MM/DD/YY', 'MM-DD-YYYY', 'MM-DD-YY'];
 
 const { RangePicker } = DatePicker;
 
-const Filter = ({ onClose, stockCount }) => {
+const Filter = ({ onClose, stockCount, langText }) => {
   const {
     filterData: formData,
     setFilterData: setFormData,
@@ -93,10 +93,10 @@ const Filter = ({ onClose, stockCount }) => {
   };
   return (
     <section className={styles.filter}>
-      <h2>Filtro</h2>
+      <h2>{langText['modal_filter_title']}</h2>
       {isFilterActive() && (
         <div className={styles.count}>
-          Se encontraron: {stockCount} registros
+          {`${langText['modal_filter_record_count1']}: ${stockCount} ${langText['modal_filter_record_count2']}`}
         </div>
       )}
       <Spin spinning={loadingData}>
@@ -116,20 +116,10 @@ const Filter = ({ onClose, stockCount }) => {
             peso: [formData.peso1, formData.peso2],
           }}
         >
-          <Form.Item name="buscar" label="Search" className={styles.hidden}>
-            <Input
-              value={filterSearch}
-              placeholder="Nro de ganado"
-              allowClear={true}
-              // addonBefore={<SearchOutlined />}
-              onChange={(e) => {
-                setFilterSearch(e.target.value);
-                // handleChange('buscar', e.target.value);
-              }}
-            />
-          </Form.Item>
-
-          <Form.Item name="loteNro" label="Lote">
+          <Form.Item
+            name="loteNro"
+            label={langText['modal_filter_label_batch']}
+          >
             <Select
               onChange={(val) => handleChange('loteNro', val)}
               value={formData.loteNro}
@@ -149,7 +139,10 @@ const Filter = ({ onClose, stockCount }) => {
             />
           </Form.Item>
 
-          <Form.Item label="Tipo de Ganado" name="tipoStock">
+          <Form.Item
+            label={langText['modal_filter_label_cattle_type']}
+            name="tipoStock"
+          >
             <Select
               onChange={(value) => {
                 handleChange('tipoStock', value);
@@ -160,21 +153,7 @@ const Filter = ({ onClose, stockCount }) => {
                   value: '',
                   label: '-------',
                 },
-                ...[
-                  'Vacas de Ordeño',
-                  'Vacas Cria',
-                  'Vacas Paridas',
-                  'Vacas Escoteras',
-                  'Crias Hembras',
-                  'Crias Machos',
-                  'Novillas de Viente',
-                  'Hembras de Levante',
-                  'Machos de Levante',
-                  'Machos de Ceba',
-                  'Toretes',
-                  'Toros',
-                  'Otro',
-                ].map((tipo) => ({
+                ...langText['stock_types'].map((tipo) => ({
                   key: `${tipo}`,
                   value: `${tipo}`,
                   label: `${tipo}`,
@@ -183,21 +162,37 @@ const Filter = ({ onClose, stockCount }) => {
             />
           </Form.Item>
 
-          <Form.Item name="vendido" label="Vendido">
+          <Form.Item name="vendido" label={langText['modal_filter_label_sold']}>
             <Select
               onChange={(val) => handleChange('vendido', val)}
               // value={formData.vendido}
               options={[
                 { value: '', label: '---------' },
-                { value: 'vendido', label: 'Vendido con reposicion' },
-                { value: 'sinreponer', label: 'Vendido sin reposicion' },
-                { value: 'sinvender', label: 'Sin vender' },
-                { value: 'perdida', label: 'Perdida / Muerte' },
+                {
+                  value: 'vendido',
+                  label: langText['modal_filter_label_sold_with_replenishment'],
+                },
+                {
+                  value: 'sinreponer',
+                  label:
+                    langText['modal_filter_label_sold_without_replenishment'],
+                },
+                {
+                  value: 'sinvender',
+                  label: langText['modal_filter_label_sold_not_sold'],
+                },
+                {
+                  value: 'perdida',
+                  label: langText['modal_filter_label_sold_loss_death'],
+                },
               ]}
             />
           </Form.Item>
 
-          <Form.Item name="fechaCompra" label="Fecha Compra">
+          <Form.Item
+            name="fechaCompra"
+            label={langText['modal_filter_label_date_purchased']}
+          >
             <RangePicker
               format={dateFormatList}
               allowEmpty={[false, true]}
@@ -205,7 +200,10 @@ const Filter = ({ onClose, stockCount }) => {
             />
           </Form.Item>
 
-          <Form.Item name="fechaVenta" label="Fecha Venta">
+          <Form.Item
+            name="fechaVenta"
+            label={langText['modal_filter_label_date_sold']}
+          >
             <RangePicker
               allowEmpty={[false, true]}
               onChange={(val) => handleChange('fechaVenta', val)}
@@ -213,7 +211,7 @@ const Filter = ({ onClose, stockCount }) => {
             />
           </Form.Item>
 
-          <Form.Item name="peso" label="Peso">
+          <Form.Item name="peso" label={langText['modal_filter_label_wight']}>
             <Slider
               range
               min={0}
@@ -230,7 +228,7 @@ const Filter = ({ onClose, stockCount }) => {
               disabled={!isFilterActive() ? 'disabled' : ''}
               style={{ width: '100%' }}
             >
-              Filtrar
+              {langText['modal_filter_btn_filter']}
             </Button>
           </Form.Item>
           <Form.Item noStyle>
@@ -241,7 +239,7 @@ const Filter = ({ onClose, stockCount }) => {
               }}
               style={{ marginTop: '1rem', width: '100%' }}
             >
-              Borrar Filtro
+              {langText['modal_filter_btn_clear_filter']}
             </Button>
           </Form.Item>
         </Form>

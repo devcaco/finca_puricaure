@@ -5,7 +5,7 @@ import { UploadOutlined } from '@ant-design/icons';
 
 import styles from './UploadFile.module.css';
 
-const UploadFile = ({ onClose }) => {
+const UploadFile = ({ onClose, langText }) => {
   const [fileList, setFileList] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -62,11 +62,13 @@ const UploadFile = ({ onClose }) => {
 
   return (
     <div className={styles.fileUpload}>
-      <h1> Importar Data </h1>
+      <h1> {langText['modal_import_title']} </h1>
       <div className={styles.errorMsg}>{errorMsg !== null && errorMsg}</div>
       <div>
         <Upload {...props} className={styles.upload}>
-          <Button icon={<UploadOutlined />}>Seleccionar archivo</Button>
+          <Button icon={<UploadOutlined />}>
+            {langText['modal_import_btn_select_file']}
+          </Button>
         </Upload>
       </div>
       <div className={styles.buttons}>
@@ -76,7 +78,7 @@ const UploadFile = ({ onClose }) => {
           onClick={handleUpload}
           loading={uploading}
         >
-          Cargar Archivo
+          {langText['modal_import_btn_upload_file']}
         </Button>
       </div>
     </div>
