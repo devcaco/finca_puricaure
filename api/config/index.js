@@ -14,7 +14,7 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 
 const FRONTEND_URL = process.env.ORIGIN || 'http://localhost:3000';
-console.log({FRONTEND_URL})
+console.log({ FRONTEND_URL });
 // Middleware configuration
 module.exports = (app) => {
   // Because this is a server that will accept requests from outside and it will be hosted ona server with a `proxy`, express needs to know that it should trust that setting.
@@ -24,7 +24,7 @@ module.exports = (app) => {
   // controls a very specific header to pass headers from the frontend
   app.use(
     cors({
-      origin: [FRONTEND_URL],
+      origin: [...FRONTEND_URL.split(',')],
       exposedHeaders: ['Access-Control-Allow-Origin'],
     })
   );
