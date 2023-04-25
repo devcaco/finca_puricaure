@@ -13,6 +13,7 @@ router.get('/', async (req, res, next) => {
   var origin3 = req.hostname;
   var origin4 = req.get('host');
   var origin5 = req.get('origin');
+  var originDev = process.env.ORIGIN;
 
   console.log({ origin, origin2, origin3, origin4, origin5 });
   try {
