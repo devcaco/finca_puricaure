@@ -8,6 +8,13 @@ const importData = require('../utils/importData');
 const fs = require('fs');
 
 router.get('/', async (req, res, next) => {
+  var origin = req.headers?.origin;
+  var origin2 = req.headers?.host;
+  var origin3 = req.hostname;
+  var origin4 = req.get('host');
+  var origin5 = req.get('origin');
+
+  console.log({ origin, origin2, origin3, origin4, origin5 });
   try {
     const theList = await Stock.find()
       .populate('compra.reposicion')
