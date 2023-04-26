@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link, useNavigate, redirect } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import axios from 'axios';
-import { Button, Alert } from 'antd';
+import { Button, Alert, Modal } from 'antd';
 import styles from './Login.module.css';
 
 import { Login as LoginForm } from '../components/forms/Login';
+import Register from '../components/forms/Register';
+import Language from '../components/Language';
 
 import UserContext from '../context/User.context';
 
@@ -15,14 +17,18 @@ const Login = ({ langText, showLogo }) => {
   const [alertActive, setAlertActive] = useState(false);
   const [alertMsg, setAlertMsg] = useState('');
   const [alertType, setAlertType] = useState('error');
+  const [showModal, setShowModal] = useState(false);
 
   const {
     setUserData,
     userMessage,
     setUserMessage,
+    setLang,
     storeToken,
     authenticateUser,
     isLoggedIn,
+    setLimitedAccess,
+    limitedAccess,
   } = useContext(UserContext);
 
   const navigate = useNavigate();
@@ -70,24 +76,51 @@ const Login = ({ langText, showLogo }) => {
       else {
         storeToken(response.data.authToken);
         authenticateUser();
-        // navigate('/');
-        // if (response.data.ok) redirect('/');
       }
-      //   setUserData(response.data.theUser);
     } catch (err) {
       console.log('ERROR ----> ', err);
       showAlert('error', err.message);
     }
   };
 
+  const onRegister = () => {
+    console.log('REGISTER SUCCESSFULL');
+    showAlert('success', 'Registration Successful');
+    toggleModal();
+  };
+
+  const toggleModal = () => {
+    setShowModal(!showModal);
+  };
+
   return (
     <div className={styles.login__container}>
+      <Modal
+        open={showModal}
+        centered
+        onCancel={() => setShowModal(false)}
+        footer={[]}
+        width={400}
+        destroyOnClose={true}
+      >
+        <Register
+          langText={langText}
+          toggleModal={toggleModal}
+          onRegister={onRegister}
+          formMode="new"
+        ></Register>
+      </Modal>
       <div className={styles.login__header}>
-        {showLogo ? (
-          <img src={main_logo} alt="" />
-        ) : (
-          <h1>{langText['main_title']}</h1>
-        )}
+        <div>
+          {showLogo ? (
+            <img src={main_logo} alt="" />
+          ) : (
+            <h1>{langText['main_title']}</h1>
+          )}
+        </div>
+        <div className={styles.login_lang_btn}>
+          <Language langText={langText} setLang={setLang} />
+        </div>
       </div>
       <div className={styles.login__body}>
         <div>
@@ -109,12 +142,18 @@ const Login = ({ langText, showLogo }) => {
             showAlert={showAlert}
             handleLogin={handleLogin}
             langText={langText}
+            limitedAccess={() => {
+              console.log('Setting Limited Access to True');
+              setLimitedAccess(true);
+            }}
           />
         </div>
 
         <div>
           <Button type="link">{langText['login_page_forgot_pwd']}</Button> |
-          <Button type="link">{langText['login_page_register']}</Button>
+          <Button type="link" onClick={toggleModal}>
+            {langText['login_page_register']}
+          </Button>
         </div>
       </div>
     </div>

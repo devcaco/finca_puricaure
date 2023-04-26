@@ -4,7 +4,7 @@ import { LockOutlined, UserOutlined } from '@ant-design/icons';
 
 import styles from './Login.module.css';
 
-export const Login = ({ showAlert, handleLogin, langText }) => {
+export const Login = ({ showAlert, handleLogin, langText, limitedAccess }) => {
   const handleFormError = (formErrors) => {
     console.log({ formErrors });
     showAlert('error', langText['login_form_required_fields']);
@@ -34,7 +34,10 @@ export const Login = ({ showAlert, handleLogin, langText }) => {
           label={langText['login_form_label_username']}
           name="userName"
           rules={[
-            { required: true, message: langText['login_form_label_username_error'] },
+            {
+              required: true,
+              message: langText['login_form_label_username_error'],
+            },
           ]}
           help={''}
         >
@@ -61,6 +64,11 @@ export const Login = ({ showAlert, handleLogin, langText }) => {
         <Form.Item className={styles.login__buttons}>
           <Button htmlType="submit" type="primary">
             {langText['login_form_btn_login']}
+          </Button>
+        </Form.Item>
+        <Form.Item className={styles.login__buttons}>
+          <Button htmlType="button" onClick={limitedAccess}>
+            {langText['login_form_btn_continue']}
           </Button>
         </Form.Item>
       </Form>

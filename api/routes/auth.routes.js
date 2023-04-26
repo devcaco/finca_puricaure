@@ -3,6 +3,7 @@ const User = require('../models/User.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { isAuthenticated } = require('../middleware/jwt.middleware.js');
+const fileUploader = require('../config/cloudinary.config');
 
 const saltRounds = 10;
 
@@ -19,7 +20,7 @@ router.get('/verify', isAuthenticated, (req, res, next) => {
   try {
     // If JWT token is valid the payload gets decoded by the
     // isAuthenticated middleware and made available on `req.payload`
-    
+
     // Send back the object with user data
     // previously set as the token payload
     res.status(200).json({ ok: true, payload: req.payload });
@@ -28,7 +29,7 @@ router.get('/verify', isAuthenticated, (req, res, next) => {
   }
 });
 
-router.post('/signup', async (req, res, next) => {
+router.post('/register', async (req, res, next) => {
   try {
     const data = req.body;
     console.log({ data });
@@ -69,7 +70,7 @@ router.post('/signup', async (req, res, next) => {
 
 router.post('/login', async (req, res, next) => {
   try {
-    data = req.body;
+    const data = req.body;
 
     if (!data.userName || !data.pwd)
       throw new Error('Required fields are missing');
@@ -86,6 +87,9 @@ router.post('/login', async (req, res, next) => {
       _id: theUser._id,
       email: theUser.email,
       name: theUser.fname + ' ' + theUser.lname,
+      fname: theUser.fname,
+      lname: theUser.lname,
+      picture: theUser.profilePicture,
     };
 
     const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
@@ -99,5 +103,59 @@ router.post('/login', async (req, res, next) => {
     res.status(200).json({ ok: false, errorMsg: err.message });
   }
 });
+
+router.patch(
+  '/',
+  fileUploader.single('profilePicture'),
+  async (req, res, next) => {
+    try {
+      const data = req.body;
+      const file = req.file;
+      console.log({ data });
+      console.log({ file });
+
+      if (!data._id || !data.fname || !data.lname || !data.email)
+        throw new Error('Required Fields Missing');
+
+      if (data.changePwd === 'true' && (!data.password || !data.password_2))
+        throw new Error('Password fields required');
+      if (data.changePwd && data.password !== data.password_2)
+        throw new Error('Passwords do not match');
+
+      let user = await User.findOne({ _id: data._id });
+
+      if (!user) throw new Error('User not found');
+
+      if (data.changePwd === 'true') {
+        const pwdOk = await user.checkPwd(data.oldPassword);
+        if (!pwdOk) throw new Error('Incorrect Current Password');
+
+        const encryptedPwd = await User.hashPwd(data.password);
+        if (!encryptedPwd) throw new Error('Error Saving Password');
+
+        user.password = encryptedPwd;
+        user = await user.save();
+      }
+
+      user.fname = data.fname;
+      user.lname = data.lname;
+      user.email = data.email;
+
+      if (req.file) {
+        user.profilePicture = req.file?.path;
+      } else if (data.isUserPicture === 'false') {
+        user.profilePicture = '';
+      }
+      const updatedUser = await user.save();
+
+      console.log({ updatedUser });
+
+      res.status(200).json({ ok: true, updatedUser });
+    } catch (err) {
+      console.log('ERROR -> ', err);
+      res.status(200).json({ ok: false, errorMsg: err.message });
+    }
+  }
+);
 
 module.exports = router;

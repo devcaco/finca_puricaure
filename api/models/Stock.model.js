@@ -21,21 +21,6 @@ const stockSchema = new Schema(
     },
     stockTipo: {
       type: String,
-      // enum: [
-      //   'Vacas de Ordeño',
-      //   'Vacas Cria',
-      //   'Vacas Paridas',
-      //   'Vacas Escoteras',
-      //   'Crias Hembras',
-      //   'Crias Machos',
-      //   'Novillas de Viente',
-      //   'Hembras de Levante',
-      //   'Machos de Levante',
-      //   'Machos de Ceba',
-      //   'Toretes',
-      //   'Toros',
-      //   'Otro',
-      // ],
       required: false,
     },
     pesos: [
@@ -69,7 +54,7 @@ const stockSchema = new Schema(
   {
     timestamps: true,
     toJSON: { virtuals: true, getters: true },
-    toObject: { virtuals: true },
+    toObject: { virtuals: true, getters: true },
   }
 );
 stockSchema.virtual('repo', {
@@ -78,7 +63,7 @@ stockSchema.virtual('repo', {
   foreignField: '_id',
 });
 
-stockSchema.pre(/^find/, async function (next) {
+stockSchema.pre(/^find/, async function () {
   this.populate({
     path: 'pesos',
     options: { sort: { fecha: -1, createdAt: -1 } },
@@ -88,15 +73,20 @@ stockSchema.pre(/^find/, async function (next) {
   this.populate('compra.peso');
   this.populate('venta.peso');
   this.populate('venta.reposicion');
-
-  if (this.venta?.reposicion) {
-    console.log('CALCULANDO GANACIA');
-    let precioVenta = this.totalPrecioVenta;
-    let precioCompra = this.totalPrecioCompra;
-    this.ganancia2 = precioVenta - precioCompra;
-  }
-  next();
 });
+
+stockSchema.methods.getProfit = function () {
+  const precioVenta = this.toObject().totalPrecioVenta;
+  const precioReposicion = this.toObject().venta?.reposicion?.totalPrecioCompra;
+  if (this.toObject().venta?.reposicion) return precioVenta - precioReposicion;
+  else return 0;
+};
+
+stockSchema.statics.checkSerial = async function (serial) {
+  const found = await Stock.findOne({ serialNro: serial });
+  // console.log({ found: !!!found });
+  return !!!found;
+};
 
 const Stock = model('Stock', stockSchema);
 
@@ -112,26 +102,6 @@ stockSchema.virtual('totalPrecioCompra').get(function () {
     this.populate('compra.peso');
     return this.compra?.precio * this.compra?.peso?.peso;
   }
-});
-
-stockSchema.virtual('ganancia2').get(async function () {
-  // this.populate('venta.reposicion');
-  // this.populate('compra.reposicion');
-  // if (this.venta?.fecha && this.venta?.reposicion) {
-  //   let stockReposicion = this.populate('venta.reposicion');
-  //   // console.log({ stockReposicion });
-  //   let totalPrecioVenta = this.venta?.peso?.peso * this.venta?.precio;
-  //   let totalPrecioCompra =
-  //     stockReposicion?.compra?.peso?.peso * stockReposicion?.compra?.precio;
-  //   console.log({
-  //     totalPrecioCompra,
-  //     totalPrecioVenta,
-  //     theTotal: totalPrecioVenta - totalPrecioCompra,
-  //   });
-  //   // return totalPrecioVenta - totalPrecioCompra;
-  //   return 1
-  // }
-  return 0;
 });
 
 stockSchema.virtual('diasTranscurridos').get(function () {
@@ -150,7 +120,6 @@ stockSchema.virtual('pesoPromedio').get(function () {
         (1000 * 3600 * 24)
     );
     let pesoDiff = this.venta?.peso?.peso - this.compra?.peso?.peso;
-    console.log({ pesoVenta: this.venta?.peso?.peso, dias });
     return pesoDiff / dias;
   }
 });

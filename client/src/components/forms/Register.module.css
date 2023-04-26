@@ -1,0 +1,21 @@
+.register h1 {
+    text-align: center;
+}
+
+.register Button {
+    width: 100%;
+}
+
+.errorMsg {
+    color: red;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.upload {
+    /* display: none; */
+    width: 100% !important;
+    background-color: rebeccapurple;
+}
+

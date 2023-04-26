@@ -1,27 +1,18 @@
 const router = require('express').Router();
 const Stock = require('../models/Stock.model');
 const Peso = require('../models/Peso.model');
-const multer = require('multer');
-const upload = multer({ dest: './data/' });
+// const multer = require('multer');
+// const upload = multer({ dest: './data/' });
 const exportToExcel = require('../utils/exportToExcel');
 const importData = require('../utils/importData');
 const fs = require('fs');
+const fileUpload = require('../config/multer');
 
 router.get('/', async (req, res, next) => {
-  var origin = req.headers?.origin;
-  var origin2 = req.headers?.host;
-  var origin3 = req.hostname;
-  var origin4 = req.get('host');
-  var origin5 = req.get('origin');
-  var originDev = process.env.ORIGIN;
-
-  console.log({ origin, origin2, origin3, origin4, origin5 });
   try {
     const theList = await Stock.find()
-      .populate('compra.reposicion')
-      .populate('venta.reposicion')
-      .populate('compra.peso')
-      .populate('venta.peso');
+      .sort({ createdAt: -1 })
+      .populate('compra.reposicion');
     res.status(200).json({ ok: true, stocks: theList });
   } catch (err) {
     console.log('ERROR -> ', err);
@@ -85,9 +76,12 @@ router.get('/details/:id', async (req, res, next) => {
     const response = await Stock.findById(req.params.id).populate(
       'compra.reposicion'
     );
-    // .populate('venta.reposicion');
+    console.log({ theProfit: response.getProfit() });
     if (!response) throw new Error('Invalid Stock ID Provided');
-    res.status(200).json({ ok: true, stockDetails: response });
+    res.status(200).json({
+      ok: true,
+      stockDetails: { response, profit: await response.getProfit() },
+    });
   } catch (err) {
     console.log('ERROR -> ', err.message);
     res.status(200).json({ ok: false, errorMsg: err.message });
@@ -241,7 +235,7 @@ router.delete('/', async (req, res, next) => {
   }
 });
 
-router.post('/upload', upload.single('file0'), async (req, res, next) => {
+router.post('/upload', fileUpload.single('file0'), async (req, res, next) => {
   try {
     const file = req.file;
 

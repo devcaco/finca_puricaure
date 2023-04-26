@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { Form, Slider, Input, DatePicker, Select, Button, Spin } from 'antd';
+import { Form, Slider, DatePicker, Select, Button, Spin } from 'antd';
 import FilterContext from '../../context/Filter.context';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';

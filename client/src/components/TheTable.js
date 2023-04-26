@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
-import { Table, Modal, Button, Input, Dropdown, Space } from 'antd';
+import { Table, Modal, Button, Input, Dropdown } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import {
   CheckSquareOutlined,
@@ -9,7 +9,6 @@ import {
   DownOutlined,
   FileExcelOutlined,
   FilterOutlined,
-  UserOutlined,
 } from '@ant-design/icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,7 +17,6 @@ import { faSkullCrossbones } from '@fortawesome/free-solid-svg-icons';
 import styles from './TheTable.module.css';
 
 import FilterContext from '../context/Filter.context';
-import UploadFile from './forms/UploadFile';
 
 const { confirm } = Modal;
 
@@ -32,6 +30,7 @@ const TheTable = ({
   clearSelected,
   openUpload,
   langText,
+  limitedAccess,
 }) => {
   const { filterSearch, setFilterSearch, isFilterActive, clearFilterData } =
     useContext(FilterContext);
@@ -54,9 +53,7 @@ const TheTable = ({
       onOk() {
         onDelete(selectedRows);
       },
-      onCancel() {
-        // console.log('Cancel');
-      },
+      onCancel() {},
     });
   };
 
@@ -70,12 +67,9 @@ const TheTable = ({
       width: '430px',
       cancelText: langText['confirm_export_btn_cancel'],
       onOk() {
-        // console.log('OK');
         exportData();
       },
-      onCancel() {
-        // console.log('Cancel');
-      },
+      onCancel() {},
     });
   };
 
@@ -85,8 +79,6 @@ const TheTable = ({
       dataIndex: 'stockNro',
       key: 'stockNro',
       sorter: (a, b) => {
-        // if (!+a.stockNro) console.log(a.stockNro);
-        // return a.stockNro.toString().length - b.stockNro.toString().length;
         a = !!(+a.stockNro + 1) ? +a.stockNro : 99999;
         b = !!(+b.stockNro + 1) ? +b.stockNro : 99999;
         return a - b;
@@ -113,6 +105,9 @@ const TheTable = ({
       title: langText['table_header_purchased_date'],
       dataIndex: 'compra',
       key: 'fechaCompra',
+      sorter: (a, b) => {
+        return new Date(a.compra.fecha) - new Date(b.compra.fecha);
+      },
       render: (compra) => <>{new Date(compra.fecha).toLocaleDateString()}</>,
     },
     {
@@ -228,11 +223,13 @@ const TheTable = ({
       label: langText['table_btn_options_import'],
       key: '1',
       icon: <FileExcelOutlined />,
+      disabled: limitedAccess,
     },
     {
       label: langText['table_btn_options_export'],
       key: '2',
       icon: <FileExcelOutlined />,
+      disabled: limitedAccess
     },
   ];
   const optionsProps = {
@@ -249,7 +246,7 @@ const TheTable = ({
               danger
               type="primary"
               icon={<DeleteOutlined />}
-              disabled={!selectedRows.length ? 'disabled' : ''}
+              disabled={!selectedRows.length ? 'disabled' : '' || limitedAccess}
               onClick={showConfirm}
             >
               {langText['table_btn_delete']}

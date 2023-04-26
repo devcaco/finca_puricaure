@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import langFile from '../assets/lang.json';
 
@@ -12,12 +11,11 @@ export const UserProvider = ({ children }) => {
   const [userMessage, setUserMessage] = useState(null);
   const [lang, setLang] = useState(process.env.REACT_APP_LANG || 'es');
   const [langText, setLangText] = useState({ ...langFile[lang] });
-
-  const navigate = useNavigate();
+  const [limitedAccess, setLimitedAccess] = useState(false);
 
   useEffect(() => {
     authenticateUser();
-  }, []);
+  }, [limitedAccess]);
 
   useEffect(() => {
     setLangText({ ...langFile[lang] });
@@ -39,22 +37,26 @@ export const UserProvider = ({ children }) => {
 
         if (!response.data.ok) throw new Error(response.data.errorMsg);
         else {
-          console.log({ THEDATAAA: response.data });
-
           setIsLoggedIn(true);
           setIsLoading(false);
           setUserData(response.data.payload);
         }
       } catch (err) {
-        console.log('ERROR -> ', err);
         setIsLoading(false);
         setUserData(null);
         setIsLoggedIn(false);
       }
     } else {
-      setIsLoading(false);
-      setUserData(null);
-      setIsLoggedIn(false);
+      console.log('AUTHINGTICATING AND NO TOKEN');
+      if (limitedAccess) {
+        console.log('GIVING LIMITED ACCESS');
+        setIsLoading(false);
+        setIsLoggedIn(true);
+      } else {
+        setIsLoading(false);
+        setUserData(null);
+        setIsLoggedIn(false);
+      }
     }
   };
 
@@ -63,9 +65,19 @@ export const UserProvider = ({ children }) => {
   };
 
   const logOutUser = () => {
+    if (limitedAccess)
+      setUserMessage({
+        type: 'warning',
+        message: langText['login_page_login_full_access_msg'],
+      });
+    else
+      setUserMessage({
+        type: 'success',
+        message: langText['login_page_logout_msg'],
+      });
     removeToken();
+    setLimitedAccess(false);
     authenticateUser();
-    setUserMessage({ type: 'success', message: 'You are now Logged Out' });
   };
 
   return (
@@ -85,6 +97,8 @@ export const UserProvider = ({ children }) => {
           setUserMessage,
           langText,
           setLang,
+          setLimitedAccess,
+          limitedAccess,
         }}
       >
         {children}

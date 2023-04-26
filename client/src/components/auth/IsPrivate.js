@@ -9,6 +9,7 @@ function IsPrivate({ children, allowAuth }) {
   if (isLoading) return <p></p>;
 
   if (allowAuth && !isLoggedIn) {
+    console.log('NOT LOGGED IN REDIRECTING')
     // If the user is not logged in
     return <Navigate to="/login" />;
   } else {

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Route, Routes, useNavigate, redirect } from 'react-router-dom';
+import { Route, Routes, redirect } from 'react-router-dom';
 
 import IsPrivate from './components/auth/IsPrivate';
 import Main from './pages/Main';
@@ -10,17 +10,17 @@ import UserContext from './context/User.context';
 import './App.css';
 
 function App() {
-  const { isLoggedIn, langText } = useContext(UserContext);
-  const navigate = useNavigate();
+  const { isLoggedIn, langText, limitedAccess, userData, setUserData } =
+    useContext(UserContext);
 
   const checkAuth = () => {
     if (!isLoggedIn) return redirect('/login');
   };
 
   const allowAuth = !!(process.env.REACT_APP_AUTH === 'true');
-  const allowLang = !!(process.env.REACT_APP_LANG === 'true');
+  const allowLang = !!(process.env.REACT_APP_SHOWLANG === 'true');
   const showLogo = !!(process.env.REACT_APP_LOGO === 'true');
-  console.log({ allowAuth });
+  console.log({ allowLang });
   return (
     <div className="App">
       <Routes>
@@ -33,6 +33,9 @@ function App() {
                 allowLang={allowLang}
                 allowAuth={allowAuth}
                 showLogo={showLogo}
+                limitedAccess={limitedAccess}
+                userData={userData}
+                setUserData={setUserData}
               />
             </IsPrivate>
           }

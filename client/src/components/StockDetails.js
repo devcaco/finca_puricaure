@@ -30,13 +30,7 @@ const StockDetails = ({ stockId, onClose, langText }) => {
 
         if (response.data.ok) {
           const data = response.data.stockDetails;
-          let totalGanancia = 0;
-          if (data.venta?.reposicion) {
-            const precioVenta = data.totalPrecioVenta;
-            const precioReposicion = data.venta?.reposicion?.totalPrecioCompra;
-            totalGanancia = precioVenta - precioReposicion;
-          }
-          setStockDetails({ ...data, totalGanancia });
+          setStockDetails({ ...data.response, profit: data.profit });
           setformData(data);
         } else throw new Error(response.data.errorMsg);
         setDataLoading(false);
@@ -440,7 +434,9 @@ const StockDetails = ({ stockId, onClose, langText }) => {
                               <Col span={12}>
                                 {langText['stock_details_profit_text']}
                               </Col>
-                              <Col span={12}>$ {stockDetails?.totalGanancia?.toFixed(2)}</Col>
+                              <Col span={12}>
+                                $ {stockDetails?.profit?.toFixed(2)}
+                              </Col>
                             </Row>
                           </div>
                         </Col>

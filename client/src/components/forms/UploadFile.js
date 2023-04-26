@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Button, Upload } from 'antd';
+import { Button, Upload, Spin } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 
 import styles from './UploadFile.module.css';
@@ -61,27 +61,29 @@ const UploadFile = ({ onClose, langText }) => {
   };
 
   return (
-    <div className={styles.fileUpload}>
-      <h1> {langText['modal_import_title']} </h1>
-      <div className={styles.errorMsg}>{errorMsg !== null && errorMsg}</div>
-      <div>
-        <Upload {...props} className={styles.upload}>
-          <Button icon={<UploadOutlined />}>
-            {langText['modal_import_btn_select_file']}
+    <Spin spinning={uploading}>
+      <div className={styles.fileUpload}>
+        <h1> {langText['modal_import_title']} </h1>
+        <div className={styles.errorMsg}>{errorMsg !== null && errorMsg}</div>
+        <div>
+          <Upload {...props} className={styles.upload}>
+            <Button icon={<UploadOutlined />}>
+              {langText['modal_import_btn_select_file']}
+            </Button>
+          </Upload>
+        </div>
+        <div className={styles.buttons}>
+          <Button
+            type="primary"
+            disabled={fileList.length === 0}
+            onClick={handleUpload}
+            loading={uploading}
+          >
+            {langText['modal_import_btn_upload_file']}
           </Button>
-        </Upload>
+        </div>
       </div>
-      <div className={styles.buttons}>
-        <Button
-          type="primary"
-          disabled={fileList.length === 0}
-          onClick={handleUpload}
-          loading={uploading}
-        >
-          {langText['modal_import_btn_upload_file']}
-        </Button>
-      </div>
-    </div>
+    </Spin>
   );
 };
 

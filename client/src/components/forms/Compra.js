@@ -7,8 +7,6 @@ import {
   InputNumber,
   Select,
   DatePicker,
-  Switch,
-  Tooltip,
 } from 'antd';
 
 import dayjs from 'dayjs';

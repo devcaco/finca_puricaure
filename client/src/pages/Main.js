@@ -12,12 +12,21 @@ import TheTable from '../components/TheTable';
 import StockDetails from '../components/StockDetails';
 import Filter from '../components/forms/Filter';
 import UploadFile from '../components/forms/UploadFile';
+import Register from '../components/forms/Register';
 
 import FilterContext from '../context/Filter.context';
 
 import styles from './Main.module.css';
 
-function Main({ langText, allowLang, allowAuth, showLogo }) {
+function Main({
+  langText,
+  allowLang,
+  allowAuth,
+  showLogo,
+  limitedAccess,
+  userData,
+  setUserData,
+}) {
   const { filterData, filterSearch } = useContext(FilterContext);
 
   const [showModal, setShowModal] = useState(false);
@@ -80,7 +89,7 @@ function Main({ langText, allowLang, allowAuth, showLogo }) {
         if (filter.vendido === 'sinvender') {
           filteredStock = [
             ...filteredStock.filter((stock) =>
-              stock.venta.fecha && Object.keys(stock.venta).length > 0
+              stock.venta?.fecha && Object.keys(stock.venta).length > 0
                 ? false
                 : true
             ),
@@ -89,7 +98,7 @@ function Main({ langText, allowLang, allowAuth, showLogo }) {
           filteredStock = [
             ...filteredStock.filter((stock) => {
               if (stock.venta?.tipo === 'perdida') return false;
-              if (!stock.venta.fecha || Object.keys(stock.venta).length === 0)
+              if (!stock.venta?.fecha || Object.keys(stock.venta).length === 0)
                 return false;
 
               return !!!(
@@ -103,7 +112,7 @@ function Main({ langText, allowLang, allowAuth, showLogo }) {
               return (
                 stock.venta &&
                 Object.keys(stock.venta).length > 0 &&
-                stock.venta.reposicion
+                stock.venta?.reposicion
               );
             }),
           ];
@@ -229,6 +238,10 @@ function Main({ langText, allowLang, allowAuth, showLogo }) {
         setModalWidth(500);
         setActiveForm('upload');
         break;
+      case 'profile':
+        setModalWidth(500);
+        setActiveForm('profile');
+        break;
       default:
         setModalWidth(500);
         setActiveForm('');
@@ -245,9 +258,18 @@ function Main({ langText, allowLang, allowAuth, showLogo }) {
     // setClearTableSelection(!clearTableSelection);
   };
 
+  const onEditProfile = () => {
+    handleOnClose(false);
+  };
+
   return (
     <div className={styles.main}>
-      <Header allowLang={allowLang} allowAuth={allowAuth} showLogo={showLogo} />
+      <Header
+        allowLang={allowLang}
+        allowAuth={allowAuth}
+        showLogo={showLogo}
+        onEditProfile={handleShowModal}
+      />
       <Modal
         open={showModal}
         centered
@@ -291,15 +313,28 @@ function Main({ langText, allowLang, allowAuth, showLogo }) {
         {activeForm === 'upload' && (
           <UploadFile onClose={handleOnClose} langText={langText} />
         )}
+        {activeForm === 'profile' && (
+          <Register
+            langText={langText}
+            onClose={handleOnClose}
+            mode="edit"
+            theUser={userData}
+            onEditProfile={onEditProfile}
+            setUserData={setUserData}
+            userData={userData}
+          />
+        )}
       </Modal>
       <Buttons
         onShowModal={handleShowModal}
         isValid={!!lastSelected}
         langText={langText}
+        disabled={limitedAccess}
       />
       <TheTable
         loading={loading}
         stocks={stocks}
+        limitedAccess={limitedAccess}
         onDelete={deleteStock}
         onClick={handleShowDetails}
         openFilter={handleShowModal}

@@ -16,6 +16,18 @@
 }
 
 .login__header {
+  position: relative;
+  width: 100%;
+  /* background-color: aqua; */
+  align-self: center;
+  text-align: center;
+}
+
+.login_lang_btn {
+  position: absolute;
+  /* background-color: red; */
+  right: 0;
+  bottom: 0
 }
 
 .login__body {
